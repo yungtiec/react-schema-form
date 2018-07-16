@@ -23,7 +23,7 @@ class App extends React.Component {
     schema: {...},
     uiSchema: {...},
     values: {...},
-    errors: []
+    ...
   }
 
   handleChange = data => {

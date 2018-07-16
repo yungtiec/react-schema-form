@@ -1,0 +1,15 @@
+{
+  "name": "@react-schema-form/bootstrap",
+  "version": "1.0.0",
+  "description": "Templates and widgets for React Schema Form",
+  "main": "dist/bundle.js",
+  "source": "src/index.js",
+  "author": "Matej Mazur",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-react": "^6.24.1"
+  }
+}

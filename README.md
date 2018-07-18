@@ -61,12 +61,14 @@ class App extends Component {
       sum: { type: 'number', resolver: 'sum' }
     }
   };
+
   resolvers = {
     sum: {
       arguments: ['a', 'b'],
       resolver: (a, b) => a + b
     }
   };
+
   state = {
     formKey: 0,
     values: {}
@@ -116,7 +118,7 @@ class App extends Component {
     this.setState({ values });
   };
 
-  handleBlur = name => {
+  handleBlur = ({ name }) => {
     /**
      * This is only one of the many solutions
      */

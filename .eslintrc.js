@@ -18,7 +18,8 @@ module.exports = {
     'linebreak-style': ['error', 'unix'],
     quotes: ['error', 'single'],
     semi: ['error', 'always'],
-    'react/jsx-uses-react': 2,
-    'react/jsx-uses-vars': 2
+    'react/jsx-uses-react':'error',
+    'react/jsx-uses-vars': 'error',
+    'react/jsx-no-undef': 'error'
   }
 };

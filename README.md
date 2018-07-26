@@ -1,6 +1,6 @@
 # NOT WORKING YET (it's under development)
 
-_(the current progress in the [mohawk branch](https://github.com/MatejMazur/react-schema-form/tree/mohawk))_
+_(the current progress is in the [mohawk branch](https://github.com/MatejMazur/react-schema-form/tree/mohawk))_
 
 # React Schema Form
 

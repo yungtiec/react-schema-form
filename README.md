@@ -3,7 +3,7 @@
 
 # React Schema Form
 
-A React library for building forms with schema based on [JSON Schema](http://json-schema.org/).
+A React library for building forms based on [JSON Schema](http://json-schema.org/).
 
 ## Examples
 

@@ -1,3 +1,5 @@
+# NOT WORKING _(in development stage)_
+
 # React Schema Form
 
 A React library for building forms with schema based on [JSON Schema](http://json-schema.org/).

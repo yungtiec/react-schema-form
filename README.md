@@ -15,7 +15,7 @@ A React library for building forms based on [JSON Schema](http://json-schema.org
 
 ## Comparison with [rjsf](https://github.com/mozilla-services/react-jsonschema-form)
 
-_(checkbox indicates the current status: completed/in development)_
+_(checkbox indicates the current status: completed/in development, related issue: [Roadmap v1.0.0](https://github.com/MatejMazur/react-schema-form/issues/2))_
 
 - [ ] removed `props.formContext` (user can use custom)
 - [ ] registry is an object with only components

@@ -15,39 +15,41 @@ A React library for building forms based on [JSON Schema](http://json-schema.org
 
 ## Comparison with [rjsf](https://github.com/mozilla-services/react-jsonschema-form)
 
-- removed `props.formContext` (user can use custom)
-- registry is an object with only components
-- form instance management is done via [`props.key`](https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html#recommendation-fully-uncontrolled-component-with-a-key)
-- removed support for JSON schema definitions (you can use JavaScript variables)
-- removed support for JSON schema conditionals (oneOf, anyOf,...) (you can use resolvers)
-- added support for resolvers in JSON based schema
-- added `props.resolvers` (conditional fields, derived values)
-- internal formData renamed to values
-- removed `props.formData`
-- added `props.initialValues`
-- UI agnostic (multiple packages with different themes or you can build your custom)
-- removed `props.FieldTemplate`
-- added `props.templates.FieldTemplate`
-- removed `props.ArrayFieldTemplate`
-- added `props.templates.ArrayFieldTemplate`
-- removed `props.ObjectFieldTemplate`
-- added `props.templates.ObjectFieldTemplate`
-- removed `props.ErrorList`
-- added `props.templates.ErrorListTemplate`
-- removed `props.fields.TitleField`
-- added `props.templates.TitleTemplate`
-- removed `props.fields.DescriptionField`
-- added `props.templates.DescriptionTemplate`
-- removed `props.children`
-- added `props.templates.SubmitTemplate`
-- internal merge of `NormalArrayFieldTemplate` with `FixedArrayFieldTemplate`
-- internal change of `rawErrors` to `errors`
-- internal change of `rawHelp` to `help`
-- uiSchema:
-  - added `ui:FieldTemplate`
-  - added `ui:ArrayFieldTemplate`
-  - added `ui:ObjectFieldTemplate`
-- removed `safeRenderCompletion` (this was an ugly heck! we should find out a better approach)
+_(checkbox indicates the current status: completed/in development)_
+
+- [ ] removed `props.formContext` (user can use custom)
+- [ ] registry is an object with only components
+- [ ] form instance management is done via [`props.key`](https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html#recommendation-fully-uncontrolled-component-with-a-key)
+- [ ] removed support for JSON schema definitions (you can use JavaScript variables)
+- [ ] removed support for JSON schema conditionals (oneOf, anyOf,...) (you can use resolvers)
+- [ ] added support for resolvers in JSON based schema
+- [ ] added `props.resolvers` (conditional fields, derived values)
+- [ ] internal formData renamed to values
+- [ ] removed `props.formData`
+- [ ] added `props.initialValues`
+- [ ] UI agnostic (multiple packages with different themes or you can build your custom)
+- [ ] removed `props.FieldTemplate`
+- [ ] added `props.templates.FieldTemplate`
+- [ ] removed `props.ArrayFieldTemplate`
+- [ ] added `props.templates.ArrayFieldTemplate`
+- [ ] removed `props.ObjectFieldTemplate`
+- [ ] added `props.templates.ObjectFieldTemplate`
+- [ ] removed `props.ErrorList`
+- [ ] added `props.templates.ErrorListTemplate`
+- [ ] removed `props.fields.TitleField`
+- [ ] added `props.templates.TitleTemplate`
+- [ ] removed `props.fields.DescriptionField`
+- [ ] added `props.templates.DescriptionTemplate`
+- [ ] removed `props.children`
+- [ ] added `props.templates.SubmitTemplate`
+- [ ] internal merge of `NormalArrayFieldTemplate` with `FixedArrayFieldTemplate`
+- [ ] internal change of `rawErrors` to `errors`
+- [ ] internal change of `rawHelp` to `help`
+- [ ] uiSchema:
+  - [ ] added `ui:FieldTemplate`
+  - [ ] added `ui:ArrayFieldTemplate`
+  - [ ] added `ui:ObjectFieldTemplate`
+- [ ] removed `safeRenderCompletion` (this was an ugly heck! we should find out a better approach)
 
 ## Examples
 

@@ -6,6 +6,9 @@
   "source": "src/index.js",
   "author": "Matej Mazur",
   "license": "MIT",
+  "dependencies": {
+    "@react-schema-form/core": "1.0.0"
+  },
   "devDependencies": {
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",

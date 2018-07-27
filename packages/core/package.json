@@ -1,7 +1,7 @@
 {
   "name": "@react-schema-form/core",
   "version": "1.0.0",
-  "description": "Form and fields of React Schema Form",
+  "description": "The core of React Schema Form",
   "main": "dist/bundle.js",
   "source": "src/index.js",
   "author": "Matej Mazur",

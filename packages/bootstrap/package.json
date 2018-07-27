@@ -1,7 +1,7 @@
 {
   "name": "@react-schema-form/bootstrap",
   "version": "1.0.0",
-  "description": "Templates and widgets for React Schema Form",
+  "description": "React Schema Form with Bootstrap theme",
   "main": "dist/bundle.js",
   "source": "src/index.js",
   "author": "Matej Mazur",

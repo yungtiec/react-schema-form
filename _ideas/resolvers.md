@@ -12,12 +12,12 @@ const schema = {
   type: 'string',
   resolver: {
     selectors: [value => value, (value, formProps) => formProps.secretEnabled],
-    schema: memoize((value, secretEnabled) => {
+    schema: (value, secretEnabled) => {
       if (secretEnabled && value === 'show me the secret title!') {
         return { title: 'This is the secret title!' };
       }
       return;
-    })
+    }
   }
 };
 

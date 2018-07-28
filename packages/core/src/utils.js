@@ -1,7 +1,11 @@
 export const get = (path, initialObject) =>
-  path.reduce((object, key) => object[key], initialObject);
+  path.reduce(
+    (object, key) =>
+      key.charAt(0) === '#' ? object[Number(key.substring(1))] : object[key],
+    initialObject
+  );
 
-const isNumber = input => isFinite(input) && !isNaN(input);
+export const isNumber = input => isFinite(input) && !isNaN(input);
 
 export const toIdSchema = ({
   schema,

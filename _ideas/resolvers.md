@@ -123,47 +123,8 @@ const resolvers = {
 
 ### Internals
 
-Resolvers could be solved in `connect()(SchemaField)`:
-
-```js
-import { get } from './utils-path';
-
-const mapProps = (allValues, ownProps) => {
-  let schema;
-  let values;
-
-  if (ownProps.schema.resolver) {
-    const { resolver } = ownProps.schema;
-    if (resolver.schema) {
-      schema = {
-        ...schema,
-        ...resolver.schema(
-          ...resolver.selectors.map(selector => selector(allValues))
-        )
-      };
-
-      // resolver.schema can return resolver.value!
-      if (schema.resolver) {
-        values = schema.resolver.value(
-          ...schema.resolver.selectors.map(selector => selector(allValues))
-        );
-      }
-    } else {
-      values = resolver.value(
-        ...resolver.selectors.map(selector => selector(allValues))
-      );
-    }
-  } else {
-    schema = ownProps.schema;
-    values = get(ownProps.idSchema.$values, values);
-  }
-  return { schema, values };
-};
-
-export default resolve(map)(SchemaField);
-```
-
-We could use the `reselect` for memoization:
+Resolvers could be solved in `connect()(SchemaField)`.
+We could use the `reselect` for memoization.
 
 ```js
 import { withRegistry } from '../RegistryContext';

@@ -142,36 +142,58 @@ const getIndex = path => {
   }
 };
 
+const getResolver = (schema, formProps) =>
+  typeof schema.resolver === 'string'
+    ? formProps.resolvers[schema.resolver]
+    : schema.resolver;
+
 const resolve = (resolver, selectors, values, index, formProps) =>
   createSelector(
     selectors.map(selector => selector(values, index, formProps)),
     resolver
   );
 
-const makeResolveSchema = () => {
+const makeResolveSchema = index => {
   return (values, ownProps, formProps) => {
-    if (ownProps.schema.resolver && ownProps.schema.resolver.schema) {
-      const { selectors, schema: resolver } = ownProps.schema.resolver;
-      return resolve(resolver, selectors, values, index, formProps);
-    } else {
-      return ownProps.schema;
+    if (ownProps.schema.resolver) {
+      const resolver = getResolver(ownProps.schema, formProps);
+
+      if (resolver.schema) {
+        const schema = resolve(
+          resolver.schema,
+          resolver.selectors,
+          values,
+          index,
+          formProps
+        );
+
+        return schema ? { ...ownProps.schema, ...schema } : ownProps.schema;
+      }
     }
+    return ownProps.schema;
   };
 };
 
 const makeResolveValues = index => {
   return (values, ownProps, formProps) => {
     if (ownProps.schema.type !== 'object') {
-      if (ownProps.schema.resolver && ownProps.schema.resolver.value) {
-        const { selectors, value: resolver } = ownProps.schema.resolver;
-        return resolve(resolver, selectors, values, index, formProps);
-      } else {
-        const path = [...ownProps.idSchema.$path];
-        if (index) {
-          path[path.length - 1] = index;
+      if (ownProps.schema.resolver) {
+        const resolver = getResolver(ownProps.schema, formProps);
+        if (resolver.value) {
+          return resolve(
+            resolver.value,
+            resolver.selectors,
+            values,
+            index,
+            formProps
+          );
         }
-        return get(path, values);
       }
+      const path = [...ownProps.idSchema.$path];
+      if (index) {
+        path[path.length - 1] = index;
+      }
+      return get(path, values);
     } else {
       return undefined;
     }

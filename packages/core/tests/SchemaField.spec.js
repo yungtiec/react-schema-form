@@ -1,12 +1,17 @@
-import { get, isNumber, toIdSchema } from '../src/utils';
-import { map } from '../src/fields/SchemaField';
+import { testEach } from '../../../tests/test-utils';
 
-describe('resolvers', () => {
+import { getValue, isNumber, toIdSchema } from '../src/utils';
+import { createMap } from '../src/fields/SchemaField';
+
+describe('resolve', () => {
   describe('a primitive type: dependent schema', () => {
     const resolver = {
-      selectors: [value => value],
-      schema: value => {
-        if (value === 'show me the secret title!') {
+      selectors: [
+        value => value,
+        (values, path, formContext) => formContext.secretEnabled
+      ],
+      schema: (value, secretEnabled) => {
+        if (secretEnabled && value === 'show me the secret title!') {
           return { title: 'This is the secret title!' };
         }
       }
@@ -21,6 +26,7 @@ describe('resolvers', () => {
       {
         title: 'should return the untouched schema with undefined value',
         values: undefined,
+        formContext: { secretEnabled: true },
         expected: {
           schema,
           values: undefined
@@ -29,14 +35,25 @@ describe('resolvers', () => {
       {
         title: 'should return the untouched schema with non matching value',
         values: 'foo',
+        formContext: { secretEnabled: true },
         expected: {
           schema,
           values: 'foo'
         }
       },
       {
+        title: 'should access the formContext',
+        values: 'show me the secret title!',
+        formContext: { secretEnabled: false },
+        expected: {
+          schema,
+          values: 'show me the secret title!'
+        }
+      },
+      {
         title: 'should return the extended schema with matching value',
         values: 'show me the secret title!',
+        formContext: { secretEnabled: true },
         expected: {
           schema: {
             title: 'This is the secret title!',
@@ -48,34 +65,33 @@ describe('resolvers', () => {
       }
     ];
 
-    testCases.forEach(testCase =>
-      test(testCase.title, () => {
-        const ownProps = { schema, idSchema };
-        const formProps = {};
-        const closuredMap = map(testCase.values, ownProps, formProps);
-        const actual = closuredMap(
-          testCase.values,
-          ownProps,
-          testCase.formProps
-        );
-        expect(actual).toEqual(testCase.expected);
-      })
-    );
+    testEach(testCase => {
+      const props = {
+        schema,
+        idSchema,
+        values: testCase.values,
+        formContext: testCase.formContext
+      };
+      const map = createMap(props);
+      const actual = map(props);
+      expect(actual).toEqual(testCase.expected);
+    })(testCases);
 
     it('should work with external resolvers (formProps.resolvers)', () => {
       const initialSchema = { type: 'string', resolver: 'secret' };
       const values = 'show me the secret title!';
-      const ownProps = {
+      const props = {
         schema: initialSchema,
-        idSchema
+        idSchema,
+        values,
+        resolvers: { secret: resolver },
+        formContext: { secretEnabled: true }
       };
-      const formProps = { resolvers: { secret: resolver } };
-      const closuredMap = map(values, ownProps, formProps);
-      const actual = closuredMap(
-        'show me the secret title!',
-        ownProps,
-        formProps
-      );
+      const map = createMap(props);
+      const actual = map({
+        ...props,
+        values: 'show me the secret title!'
+      });
       expect(actual).toEqual({
         schema: { ...initialSchema, title: 'This is the secret title!' },
         values
@@ -84,24 +100,24 @@ describe('resolvers', () => {
 
     test('performance (memoization)', () => {
       const spyResolver = jest.fn();
-      const values = 'foo';
-      const ownProps = {
+      const props = {
+        values: 'foo',
         schema: { ...schema, resolver: { ...resolver, schema: spyResolver } },
-        idSchema
+        idSchema,
+        formContext: { secretEnabled: true }
       };
-      const formProps = {};
-      const closuredMap = map(values, ownProps, formProps);
+      const map = createMap(props);
 
       expect(spyResolver).not.toHaveBeenCalled();
 
-      closuredMap(values, ownProps, formProps);
+      map(props);
       expect(spyResolver).toHaveBeenCalledTimes(1);
 
       // memoized result
-      closuredMap(values, ownProps, formProps);
+      map(props);
       expect(spyResolver).toHaveBeenCalledTimes(1);
 
-      closuredMap('bar', ownProps, formProps);
+      map({ ...props, values: 'bar' });
       expect(spyResolver).toHaveBeenCalledTimes(2);
     });
   });
@@ -132,10 +148,9 @@ describe('resolvers', () => {
 
     it('should not load values for an object entity', () => {
       const values = { a: 1, b: 2 };
-      const ownProps = { schema, idSchema };
-      const formProps = { resolvers };
-      const closuredMap = map(values, ownProps, formProps);
-      const actual = closuredMap(values, ownProps, formProps);
+      const props = { schema, idSchema, values, resolvers };
+      const map = createMap(props);
+      const actual = map(props);
       const expected = { schema, values: undefined };
 
       expect(actual).toEqual(expected);
@@ -143,15 +158,16 @@ describe('resolvers', () => {
 
     it('should resolve the derived value', () => {
       const values = { a: 1, b: 2 };
-      const ownProps = {
+      const props = {
         schema: schema.properties.sum,
-        idSchema: idSchema.sum
+        idSchema: idSchema.sum,
+        values,
+        resolvers
       };
-      const formProps = { resolvers };
-      const closuredMap = map(values, ownProps, formProps);
-      const actual = closuredMap(values, ownProps, formProps);
+      const map = createMap(props);
+      const actual = map(props);
       const expected = {
-        schema: ownProps.schema,
+        schema: props.schema,
         values: 3
       };
 
@@ -160,14 +176,18 @@ describe('resolvers', () => {
   });
 
   describe('an array item of an object type: derived value', () => {
-    const getValue = name => (values, resolvedPath) => {
-      const path = [...resolvedPath];
+    const createSelector = name => (values, actualPath) => {
+      const path = [...actualPath];
       path[path.length - 1] = name;
-      return get(path, values);
+      return getValue(path, values);
     };
     const resolvers = {
       calc: {
-        selectors: [getValue('operation'), getValue('a'), getValue('b')],
+        selectors: [
+          createSelector('operation'),
+          createSelector('a'),
+          createSelector('b')
+        ],
         value: (operation, a, b) => {
           if (isNumber(a) && isNumber(b)) {
             switch (operation) {
@@ -216,19 +236,129 @@ describe('resolvers', () => {
     it('should resolve the derived value', () => {
       const values = [{ operation: 'max', a: 1, b: 2 }];
       const schema = parentSchema.items.properties.result;
-      const ownProps = {
+      const props = {
         schema,
-        idSchema: itemIdSchema.result
+        idSchema: itemIdSchema.result,
+        values,
+        resolvers
       };
-      const formProps = { resolvers };
-      const closuredMap = map(values, ownProps, formProps);
-      const actual = closuredMap(values, ownProps, formProps);
+      const map = createMap(props);
+      const actual = map(props);
       const expected = {
         schema,
         values: 2
       };
 
       expect(actual).toEqual(expected);
+    });
+  });
+
+  describe('dependent schema returning resolver for derived value', () => {
+    const parentSchema = {
+      type: 'object',
+      properties: {
+        useDefault: {
+          type: 'boolean'
+        },
+        constant: {
+          type: 'number'
+        },
+        value: {
+          type: 'number',
+          resolver: {
+            selectors: [values => values.useDefault],
+            schema: useDefault => useDefault && { resolver: 'calcDefaultValue' }
+          }
+        }
+      }
+    };
+    const idSchema = toIdSchema({ schema: parentSchema });
+    const resolvers = {
+      calcDefaultValue: {
+        selectors: [values => values.constant],
+        value: constant => constant + 5
+      }
+    };
+    const schema = parentSchema.properties.value;
+
+    const testCases = [
+      {
+        title: 'should use the default value',
+        values: { useDefault: true, constant: 2 },
+        expected: {
+          schema: {
+            type: 'number',
+            resolver: 'calcDefaultValue'
+          },
+          values: 7
+        }
+      },
+      {
+        title: 'should leave the undefined value',
+        values: { useDefault: false, constant: 2 },
+        expected: {
+          schema,
+          values: undefined
+        }
+      }
+    ];
+
+    testEach(testCase => {
+      const props = {
+        schema,
+        idSchema: idSchema.value,
+        values: testCase.values,
+        resolvers
+      };
+      const map = createMap(props);
+      const actual = map(props);
+
+      expect(actual).toEqual(testCase.expected);
+    })(testCases);
+
+    test('performance (memoization)', () => {
+      const spySchemaResolver = jest.fn(schema.resolver.schema);
+      const spyValueResolver = jest.fn();
+      const initProps = values => ({
+        schema: {
+          ...schema,
+          resolver: {
+            ...schema.resolver,
+            schema: spySchemaResolver
+          }
+        },
+        idSchema,
+        resolvers: {
+          calcDefaultValue: {
+            ...resolvers.calcDefaultValue,
+            value: spyValueResolver
+          }
+        },
+        values
+      });
+      const props = initProps({ useDefault: false });
+      const map = createMap(props);
+
+      expect(spySchemaResolver).not.toHaveBeenCalled();
+      expect(spyValueResolver).not.toHaveBeenCalled();
+
+      map(props);
+      expect(spySchemaResolver).toHaveBeenCalledTimes(1);
+      expect(spyValueResolver).not.toHaveBeenCalled();
+
+      // memoize
+      map(props);
+      expect(spySchemaResolver).toHaveBeenCalledTimes(1);
+
+      const newProps = initProps({ useDefault: true, constant: 5 });
+      map(newProps);
+      expect(spySchemaResolver).toHaveBeenCalledTimes(2);
+      expect(spyValueResolver).toHaveBeenCalledTimes(1);
+
+      // memoize
+      map(newProps);
+      expect(spySchemaResolver).toHaveBeenCalledTimes(2);
+      expect(spyValueResolver).toHaveBeenCalledTimes(1);
     });
   });
 });

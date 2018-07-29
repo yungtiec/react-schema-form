@@ -1,64 +1,131 @@
+import React, { Component } from 'react';
 import { createSelector } from 'reselect';
 
-import { get } from '../utils';
+import { getValue } from '../utils';
+import {
+  compose,
+  withRegistry,
+  withResolvers,
+  withFormContext,
+  withValues
+} from '../context';
 
-const getResolver = (schema, formProps) =>
-  typeof schema.resolver === 'string'
-    ? formProps.resolvers[schema.resolver]
-    : schema.resolver;
+class SchemaField extends Component {}
 
-const makeResolveSchema = (ownProps, formProps) => {
-  if (ownProps.schema.resolver) {
-    const resolver = getResolver(ownProps.schema, formProps);
+const getResolver = (schemaResolver, resolvers) =>
+  typeof schemaResolver === 'string'
+    ? resolvers[schemaResolver]
+    : schemaResolver;
+
+const makeResolveSchema = props => {
+  if (props.schema.resolver) {
+    const resolver = getResolver(props.schema.resolver, props.resolvers);
 
     if (resolver.schema) {
-      return createSelector(resolver.selectors, resolver.schema);
+      const resolveSchema = (...args) => {
+        const resolved = resolver.schema(...args);
+
+        if (resolved) {
+          return {
+            ...props.schema,
+            ...resolved
+          };
+        }
+        return props.schema;
+      };
+      return createSelector(resolver.selectors, resolveSchema);
     }
   }
 
-  return () => undefined;
+  return () => props.schema;
 };
 
-const makeResolveValues = (ownProps, formProps, index) => {
-  if (ownProps.schema.type !== 'object') {
-    if (ownProps.schema.resolver) {
-      const resolver = getResolver(ownProps.schema, formProps);
-
-      if (resolver.value) {
-        return createSelector(resolver.selectors, resolver.value);
+const makeResolveValueResolver = props =>
+  createSelector(
+    schema => schema.resolver,
+    _resolver => {
+      const resolver = getResolver(_resolver, props.resolvers);
+      if (resolver && resolver.value) {
+        return getResolver(resolver, props.resolvers);
       }
     }
+  );
 
-    const path = [...ownProps.idSchema.$path];
+const makeResolveValues = props => {
+  if (props.schema.type !== 'object') {
+    return createSelector(
+      [
+        resolver => resolver,
+        (r, values) => values,
+        (r, v, path) => path,
+        (r, v, p, formContext) => formContext
+      ],
+      (resolver, values, ...args) => {
+        if (resolver && resolver.value) {
+          return createSelector(resolver.selectors, resolver.value)(
+            values,
+            ...args
+          );
+        }
 
-    if (index) {
-      path[path.length - 1] = index;
-    }
-
-    return values => get(path, values);
+        return getValue(props.idSchema.$path, values);
+      }
+    );
   }
-
   return () => undefined;
 };
 
-export const map = (values, ownProps, formProps) => {
-  const path = ownProps.idSchema.$path;
+export const createMap = _props => {
   /**
    * each instance of the component needs
-   * its own private copy of the selector
+   * its own private copy of selectors
    */
-  const resolveSchema = makeResolveSchema(ownProps, formProps);
-  const resolveValues = makeResolveValues(ownProps, formProps, path);
+  const resolveSchema = makeResolveSchema(_props);
+  /**
+   * the value resolver can be returned from the resolveSchema
+   * so we need to memoize the value resolver which then will
+   * be passed into the resolveValues
+   */
+  const resolveValueResolver = makeResolveValueResolver(_props);
+  const resolveValues = makeResolveValues(_props);
 
-  return (values, baseOwnProps, formProps) => {
-    const schemaExtension = resolveSchema(values, path, formProps);
-    const schema = schemaExtension
-      ? { ...baseOwnProps.schema, ...schemaExtension }
-      : baseOwnProps.schema;
+  return props => {
+    const schema = resolveSchema(
+      props.values,
+      props.idSchema.$path,
+      props.formContext
+    );
+    const resolver = resolveValueResolver(schema);
 
     return {
       schema,
-      values: resolveValues(values, path, formProps)
+      values: resolveValues(
+        resolver,
+        props.values,
+        props.idSchema.$path,
+        props.formContext
+      )
     };
   };
 };
+
+const resolve = WrappedComponent => {
+  class Resolved extends Component {
+    map = createMap(this.props);
+
+    render() {
+      const mapped = this.map(this.props);
+      return <WrappedComponent {...this.props} {...mapped} />;
+    }
+  }
+
+  return Resolved;
+};
+
+export default compose(
+  withRegistry,
+  withResolvers,
+  withFormContext,
+  withValues,
+  resolve
+)(SchemaField);

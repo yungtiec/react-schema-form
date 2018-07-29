@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 
 import Form from './Form';
 import fields from './fields';
@@ -52,5 +51,5 @@ export const withTheme = (name, theme) => WrappedForm => {
 
   WithTheme.displayName = `WithTheme(${name})`;
 
-  return props => <WithTheme {...props} />;
+  return WithTheme;
 };

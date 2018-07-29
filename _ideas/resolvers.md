@@ -11,7 +11,10 @@ A resolver should solve the dependent schema or derived values. And it should su
 const schema = {
   type: 'string',
   resolver: {
-    selectors: [value => value, (value, formProps) => formProps.secretEnabled],
+    selectors: [
+      value => value,
+      (value, formContext) => formContext.secretEnabled
+    ],
     schema: (value, secretEnabled) => {
       if (secretEnabled && value === 'show me the secret title!') {
         return { title: 'This is the secret title!' };
@@ -29,7 +32,10 @@ const schema = {
 
 const resolvers = {
   showTitle: {
-    selectors: [value => value, (value, formProps) => formProps.secretEnabled],
+    selectors: [
+      value => value,
+      (value, formContext) => formContext.secretEnabled
+    ],
     schema: (value, secretEnabled) => {
       if (secretEnabled && value === 'show me the secret title!') {
         return { title: 'This is the secret title!' };
@@ -97,13 +103,12 @@ const schema = {
   }
 };
 
+const getValue = name => (values, path) => {
+  /*returns the value*/
+};
 const resolvers = {
   calc: {
-    selectors: index => [
-      values => values[index].operation,
-      values => values[index].a,
-      values => values[index].b
-    ],
+    selectors: [getValue('operation'), getValue('a'), getValue('b')],
     value: (operation, a, b) => {
       if (isNumber(a) && isNumber(b)) {
         switch (operation) {
@@ -115,109 +120,116 @@ const resolvers = {
             return new Error(`operation ${operation} doesn't exist`);
         }
       }
-      return;
     }
   }
 };
 ```
 
-### Internals
+### Relative selectors
 
-Resolvers could be solved in `connect()(SchemaField)`.
-We could use the `reselect` for memoization.
+I don't know if this should be possible by default or you should build your own helper..
+
+#### part of the lib
 
 ```js
-import { withRegistry } from '../RegistryContext';
-import { connect } from '../FormContext';
-
-const get = (path, initialObject) =>
-  path.reduce((object, key) => object[key], initialObject);
-
-const getIndex = path => {
-  const last = path[path.length - 1];
-  if (last.charAt(0) === '#') {
-    return Number(last.substring(1));
-  } else {
-    return undefined;
+const schema = {
+  type: 'array',
+  items: {
+    type: 'object',
+    properties: {
+      foo: {
+        type: 'boolean'
+      },
+      bar: {
+        type: 'string',
+        resolver: 'setBar'
+      }
+    }
   }
 };
+const resolvers = {
+  setBar: {
+    selectors: ['../foo'],
+    resolver: foo => (foo ? 'cool' : 'hmm')
+  }
+};
+```
 
-const getResolver = (schema, formProps) =>
-  typeof schema.resolver === 'string'
-    ? formProps.resolvers[schema.resolver]
-    : schema.resolver;
+#### custom helper
 
-const resolve = (resolver, selectors, values, index, formProps) =>
-  createSelector(
-    selectors.map(selector => selector(values, index, formProps)),
-    resolver
-  );
+```js
+import { createSelector } from './helpers';
 
-const makeResolveSchema = index => {
-  return (values, ownProps, formProps) => {
-    if (ownProps.schema.resolver) {
-      const resolver = getResolver(ownProps.schema, formProps);
+const schema = {}; // the same as above
+const resolvers = {
+  setBar: {
+    selectors: [createSelector('../foo')],
+    resolver: foo => (foo ? 'cool' : 'hmm')
+  }
+};
+```
 
-      if (resolver.schema) {
-        const schema = resolve(
-          resolver.schema,
-          resolver.selectors,
-          values,
-          index,
-          formProps
-        );
+**`createSelector`:**
 
-        return schema ? { ...ownProps.schema, ...schema } : ownProps.schema;
+```js
+import { getValue } from '@react-schema-form/core';
+
+const getPath = (relativePath, actualPath) => {
+  const parts = relativePath.split('/');
+  return parts.reduce((path, part) => {
+    if (part !== '') {
+      if (part === '..') {
+        path.pop();
+      } else {
+        path.push(part);
       }
     }
-    return ownProps.schema;
-  };
+    return path;
+  }, actualPath);
 };
 
-const makeResolveValues = index => {
-  return (values, ownProps, formProps) => {
-    if (ownProps.schema.type !== 'object') {
-      if (ownProps.schema.resolver) {
-        const resolver = getResolver(ownProps.schema, formProps);
-        if (resolver.value) {
-          return resolve(
-            resolver.value,
-            resolver.selectors,
-            values,
-            index,
-            formProps
-          );
-        }
-      }
-      const path = [...ownProps.idSchema.$path];
-      if (index) {
-        path[path.length - 1] = index;
-      }
-      return get(path, values);
-    } else {
-      return undefined;
+export const createSelector = relativePath => (values, actualPath) => {
+  const path = getPath(relativePath, actualPath);
+  return getValue(path, values);
+};
+```
+
+**tests:**
+
+```js
+import { testEach } from 'test-utils';
+
+describe('getPath', () => {
+  const testCases = [
+    {
+      title: 'should return the parent (nested object)',
+      relativePath: '../',
+      actualPath: ['boo', 'foo'],
+      expected: ['boo']
+    },
+    {
+      title: 'should return the sibling (object type)',
+      relativePath: '../bar',
+      actualPath: ['foo'],
+      expected: ['bar']
+    },
+    {
+      title: 'should return the sibling (array item)',
+      relativePath: '../bar',
+      actualPath: ['#0', 'foo'],
+      expected: ['#0', 'bar']
+    },
+    {
+      title: "should return the sibling's property",
+      relativePath: '../boo/bar',
+      actualPath: ['boss', 'foo'],
+      expected: ['boss', 'boo', 'bar']
     }
-  };
-};
+  ];
 
-export const map = (values, ownProps) => {
-  const index = getIndex(ownProps.idSchema.$path);
-  const resolveSchema = makeResolveSchema(index);
-  const resolveValues = makeResolveValues(index);
-
-  return (values, baseOwnProps, formProps) => {
-    const schema = resolveSchema(values, ownProps, formProps);
-    const ownProps =
-      schema === baseOwnProps.schema
-        ? baseOwnProps
-        : { ...baseOwnProps, schema };
-
-    return {
-      schema,
-      values: resolveValues(values, ownProps, formProps)
-    };
-  };
-};
-
-export default connect(map)(SchemaField);
+  testEach(testCase => {
+    const actual = getPath(testCase.relativePath, testCase.actualPath);
+    expect(actual).toEqual(testCase.expected);
+  })(testCases);
+});
 ```

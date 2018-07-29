@@ -3,6 +3,10 @@
 The JSON Schema is not the proper data structure for manipulation with data. With it you need to update deeply nested object which is bad for performance.
 So if we flatten all data structures then we should get better performance on updates. And in the same time we'll get the chance to compare schema, uiSchema and values for the actual resolved component so if we use React context for subscribing to data then we can update only the related components even without the updating all the components above them.
 
+## Canceled
+
+It's not the priority at the moment.
+
 ## `schema`: JSON Schema
 
 JSON Schema is nested only if the property `type` is "object" or "array".

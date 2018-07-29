@@ -1,4 +1,4 @@
-export const get = (path, initialObject) =>
+export const getValue = (path, initialObject) =>
   path.reduce(
     (object, key) =>
       key.charAt(0) === '#' ? object[Number(key.substring(1))] : object[key],

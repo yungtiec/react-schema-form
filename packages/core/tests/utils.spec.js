@@ -1,6 +1,28 @@
-import { toIdSchema } from '../src/utils';
+import { testEach } from '../../../tests/test-utils';
+
+import { getValue, toIdSchema } from '../src/utils';
 
 describe('utils', () => {
+  describe('getValue', () => {
+    const testCases = [
+      {
+        title: 'empty path',
+        path: [],
+        object: {
+          foo: 'bar'
+        },
+        expected: {
+          foo: 'bar'
+        }
+      }
+    ];
+
+    testEach(testCase => {
+      const actual = getValue(testCase.path, testCase.object);
+      expect(actual).toEqual(testCase.expected);
+    })(testCases);
+  });
+
   describe('toIdSchema', () => {
     const testCases = [
       {
@@ -173,16 +195,9 @@ describe('utils', () => {
       }
     ];
 
-    testCases.forEach(testCase => {
-      const _test = testCase.skip
-        ? test.skip
-        : testCase.only
-          ? test.only
-          : test;
-      _test(testCase.title, () => {
-        const actual = toIdSchema(testCase.param);
-        expect(actual).toEqual(testCase.expected.idSchema);
-      });
-    });
+    testEach(testCase => {
+      const actual = toIdSchema(testCase.param);
+      expect(actual).toEqual(testCase.expected.idSchema);
+    })(testCases);
   });
 });

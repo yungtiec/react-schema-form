@@ -11,48 +11,46 @@ import {
   withValues
 } from './context';
 
+export { Form };
+
 export { compose, withRegistry, withResolvers, withFormContext, withValues };
 
-export default class WithTheme extends Component {
-  static propTypes = {
-    theme: PropTypes.shape({
-      widgets: PropTypes.objectOf(PropTypes.func).isRequired,
-      templates: PropTypes.objectOf(PropTypes.func).isRequired
-    }).isRequired,
-    fields: PropTypes.objectOf(PropTypes.func),
-    widgets: PropTypes.objectOf(PropTypes.func),
-    templates: PropTypes.objectOf(PropTypes.func)
-  };
+export const withTheme = (name, theme) => WrappedForm => {
+  class WithTheme extends Component {
+    static defaultProps = {
+      fields: {},
+      widgets: {},
+      templates: {}
+    };
 
-  static defaultProps = {
-    fields: {},
-    widgets: {},
-    templates: {}
-  };
+    fields = {
+      ...fields,
+      ...this.props.fields
+    };
 
-  fields = {
-    ...fields,
-    ...this.props.fields
-  };
+    widgets = {
+      ...theme.widgets,
+      ...this.props.widgets
+    };
 
-  widgets = {
-    ...this.props.theme.widgets,
-    ...this.props.widgets
-  };
+    templates = {
+      ...theme.templates,
+      ...this.props.templates
+    };
 
-  templates = {
-    ...this.props.theme.templates,
-    ...this.props.templates
-  };
-
-  render() {
-    return (
-      <Form
-        {...this.props}
-        fields={this.fields}
-        widgets={this.widgets}
-        templates={this.templates}
-      />
-    );
+    render() {
+      return (
+        <WrappedForm
+          {...this.props}
+          fields={this.fields}
+          widgets={this.widgets}
+          templates={this.templates}
+        />
+      );
+    }
   }
-}
+
+  WithTheme.displayName = `WithTheme(${name})`;
+
+  return props => <WithTheme {...props} />;
+};

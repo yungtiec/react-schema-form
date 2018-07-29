@@ -299,35 +299,101 @@ class App extends Component {
 }
 ```
 
-## Custom validation
-
-```js
-const schema = {
-  title: 'sign in',
-  type: 'object',
-  properties: {
-    username: {
-      type: 'string'
-    },
-    pass1: {
-      title: 'password',
-      type: 'string',
-      minLength: 3
-    },
-    pass2: {
-      title: 'repeat password',
-      type: 'string'
-      minLength: 3,
-      validate: {
-        condition: (value, values) => value === values.pass1,
-        error: `password don't match`
-      }
-    }
-  }
-};
-```
-
 ## API
+
+### Form.props (themed Form)
+
+#### rsf instance
+
+- `key`
+
+#### rsf data
+
+- `formContext`
+- `initialValues`
+- `resolvers`
+- `schema`
+- `transformErrors`
+- `uiSchema`
+- `validate`
+
+#### components
+
+- `Form`
+
+- `context`
+
+  - `Registry` (`withRegistry`)
+  - `Resolvers` (`withResolvers`)
+  - `FormContext` (`withFormContext`)
+  - `Values` (`withValues`)
+
+- `fields`
+
+  - `ArrayField` (`schema.type: 'array'`)
+  - `BooleanField` (`schema.type: 'boolean'`)
+  - `NumberField` (`schema.type: 'number'`)
+  - `ObjectField` (`schema.type: 'object'`)
+  - `SchemaField` (calls schema specific fields)
+  - `StringField` (`schema.type: 'string'`)
+  - `UnsupportedField` (unknown `schema.type`)
+
+- `templates`
+
+  - `ArrayFieldTemplate` (used in `ArrayField`)
+  - `DescriptionTemplate` (used in `ArrayField` -> `ArrayFieldTemplate`, `ObjectField` -> `ObjectFieldTemplate`, `SchemaField` -> `FieldTemplate` and `CheckboxWidget`)
+  - `ErrorListTemplate` (used in `Form`)
+  - `FieldTemplate` (used in `SchemaField`)
+  - `ObjectFieldTemplate` (used in `ObjectField`)
+  - `SubmitTemplate` (submit buttons used in `Form`)
+  - `TitleTemplate` (used in `ArrayField` -> `ArrayFieldTemplate`, `ObjectField` -> `ObjectFieldTemplate`)
+
+- `widgets`
+
+  - `AltDateTimeWidget` (`AltDateWidget`)
+  - `AltDateWidget` (`SelectWidget`)
+  - **`BaseInput`** (widget helper)
+  - `ColorWidget` (`BaseInput`)
+  - `DateTimeWidget` (`BaseInput`)
+  - `DateWidget` (`BaseInput`)
+  - `EmailWidget` (`BaseInput`)
+  - `FileWidget`
+  - `HiddenWidget`
+  - `CheckboxesWidget`
+  - `CheckboxWidget`
+  - `PasswordWidget` (`BaseInput`)
+  - `RadioWidget`
+  - `RangeWidget` (`BaseInput`)
+  - `SelectWidget`
+  - `TextareaWidget`
+  - `TextWidget` (`BaseInput`)
+  - `UpDownWidget` (`BaseInput`)
+  - `URLWidget` (`BaseInput`)
+
+- `showErrorList`
+
+#### `form` tag
+
+- `acceptCharset`
+- `action`
+- `autoComplete`
+- `className`
+- `encType`
+- `id`
+- `method`
+- `name`
+- `noHtml5Validate` === `form.props.noValidate`
+- `onSubmit`
+- `target`
+
+#### events related
+
+- `noValidate`
+- `onBlur`
+- `onChange`
+- `onError`
+- `onFocus`
+- `onSubmit`
 
 **`props.key: any` (required)**
 

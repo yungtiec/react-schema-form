@@ -17,7 +17,6 @@ A React library for building forms based on [JSON Schema](http://json-schema.org
 
 _(checkbox indicates the current status: completed/in development, related issue: [Roadmap v1.0.0](https://github.com/MatejMazur/react-schema-form/issues/2))_
 
-- [ ] removed `props.formContext` (user can use custom)
 - [ ] registry is an object with only components
 - [ ] form instance management is done via [`props.key`](https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html#recommendation-fully-uncontrolled-component-with-a-key)
 - [ ] removed support for JSON schema definitions (you can use JavaScript variables)
@@ -40,7 +39,6 @@ _(checkbox indicates the current status: completed/in development, related issue
 - [ ] added `props.templates.TitleTemplate`
 - [ ] removed `props.fields.DescriptionField`
 - [ ] added `props.templates.DescriptionTemplate`
-- [ ] removed `props.children`
 - [ ] added `props.templates.SubmitTemplate`
 - [ ] internal merge of `NormalArrayFieldTemplate` with `FixedArrayFieldTemplate`
 - [ ] internal change of `rawErrors` to `errors`

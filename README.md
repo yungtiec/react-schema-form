@@ -323,10 +323,10 @@ class App extends Component {
 
 - `context`
 
-  - `Registry` (`withRegistry`)
-  - `Resolvers` (`withResolvers`)
-  - `FormContext` (`withFormContext`)
-  - `Values` (`withValues`)
+  - `Registry` (`withRegistry` used in `SchemaField`)
+  - `Resolvers` (`withResolvers` used in `SchemaField`)
+  - `FormContext` (`withFormContext` used in `SchemaField`)
+  - `Values` (`withValues` used in `SchemaField`)
 
 - `fields`
 

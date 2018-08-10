@@ -2,57 +2,6 @@ import React from 'react';
 import 'setimmediate';
 import validateFormData from './validate';
 
-const widgetMap = {
-  boolean: {
-    checkbox: 'CheckboxWidget',
-    radio: 'RadioWidget',
-    select: 'SelectWidget',
-    hidden: 'HiddenWidget'
-  },
-  string: {
-    text: 'TextWidget',
-    password: 'PasswordWidget',
-    email: 'EmailWidget',
-    hostname: 'TextWidget',
-    ipv4: 'TextWidget',
-    ipv6: 'TextWidget',
-    uri: 'URLWidget',
-    'data-url': 'FileWidget',
-    radio: 'RadioWidget',
-    select: 'SelectWidget',
-    textarea: 'TextareaWidget',
-    hidden: 'HiddenWidget',
-    date: 'DateWidget',
-    datetime: 'DateTimeWidget',
-    'date-time': 'DateTimeWidget',
-    'alt-date': 'AltDateWidget',
-    'alt-datetime': 'AltDateTimeWidget',
-    color: 'ColorWidget',
-    file: 'FileWidget'
-  },
-  number: {
-    text: 'TextWidget',
-    select: 'SelectWidget',
-    updown: 'UpDownWidget',
-    range: 'RangeWidget',
-    radio: 'RadioWidget',
-    hidden: 'HiddenWidget'
-  },
-  integer: {
-    text: 'TextWidget',
-    select: 'SelectWidget',
-    updown: 'UpDownWidget',
-    range: 'RangeWidget',
-    radio: 'RadioWidget',
-    hidden: 'HiddenWidget'
-  },
-  array: {
-    select: 'SelectWidget',
-    checkboxes: 'CheckboxesWidget',
-    files: 'FileWidget'
-  }
-};
-
 export function getSchemaType(schema) {
   let { type } = schema;
   if (!type && schema.enum) {
@@ -89,12 +38,13 @@ export function getWidget(schema, widget, registeredWidgets = {}) {
     return getWidget(schema, registeredWidget, registeredWidgets);
   }
 
-  if (!widgetMap.hasOwnProperty(type)) {
+  if (!registeredWidgets.__widgetMap.hasOwnProperty(type)) {
     throw new Error(`No widget for type "${type}"`);
   }
 
-  if (widgetMap[type].hasOwnProperty(widget)) {
-    const registeredWidget = registeredWidgets[widgetMap[type][widget]];
+  if (registeredWidgets.__widgetMap[type].hasOwnProperty(widget)) {
+    const registeredWidget =
+      registeredWidgets[registeredWidgets.__widgetMap[type][widget]];
     return getWidget(schema, registeredWidget, registeredWidgets);
   }
 

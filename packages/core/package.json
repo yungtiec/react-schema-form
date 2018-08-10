@@ -6,6 +6,10 @@
   "source": "src/index.js",
   "author": "Matej Mazur",
   "license": "MIT",
+  "dependencies": {
+    "ajv": "^6.5.2",
+    "lodash.topath": "^4.5.2"
+  },
   "devDependencies": {
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",

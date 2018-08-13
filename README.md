@@ -1,7 +1,5 @@
 # NOT WORKING YET (it's under development)
 
-_(the current progress is in the [mohawk branch](https://github.com/MatejMazur/react-schema-form/tree/mohawk))_
-
 # React Schema Form
 
 A React library for building forms based on [JSON Schema](http://json-schema.org/).

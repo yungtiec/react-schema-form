@@ -21,7 +21,7 @@ const schema = {
 
 ### Podmíněné schéma
 
-Pouze část, která je závislá na aktuálních hodnotách entit je popsána klíčovým slovem `$extend`:
+Pouze část, která je závislá na aktuálních hodnotách entit je popsána klíčovým slovem `$modify`:
 
 ```js
 import produce from 'immer';
@@ -34,22 +34,24 @@ const initialSchema = {
       type: 'boolean'
     }
   },
-  $extend: {
+  $modify: {
     selectors: [values => values.showList],
-    resolve: schema => showList => produce(schema, draftSchema => {
+    resolve: showList => {
       if (showList) {
-        draftSchema.properties.list = {
-          title: 'seznam',
-          type: 'string',
-          enum: ['foo', 'bar']
-        };
+        return produce(draftSchema => {
+          draftSchema.properties.list = {
+            title: 'seznam',
+            type: 'string',
+            enum: ['foo', 'bar']
+          };
+        });
       }
-    });
+    }
   }
 };
 ```
 
-Klíčové slovo `$extend` je objekt obsahující selektory z aktuálních hodnot (`$extend.selectors`), které se v daném pořadí vloží jako argumenty do řešitele (`$extend.resolve`). Výstup z řešitele se poté sloučí s existujícím schématem entity.
+Klíčové slovo `$modify` je objekt obsahující selektory z aktuálních hodnot (`$modify.selectors`), které se v daném pořadí vloží jako argumenty do řešitele (`$modify.resolve`). Výstup z řešitele se poté sloučí s existujícím schématem entity.
 
 ```js
 const resolve = initResolve({ initialSchema });
@@ -73,12 +75,12 @@ expect(resolve(actualValues)).toEqual({
 });
 ```
 
-Klíčové slovo `$extend` může být název řešitele (`string`). V takovém případě je zapotřebí dodat objekt obsahující řešitele s daným názvem.
+Klíčové slovo `$modify` může být název řešitele (`string`). V takovém případě je zapotřebí dodat objekt obsahující řešitele s daným názvem.
 
 ```js
 const initialSchema = {
   type: 'object',
-  $extend: 'resolveSchemaList'
+  $modify: 'resolveSchemaList'
 };
 
 const resolvers = {
@@ -157,16 +159,19 @@ const initialSchema = {
           type: 'boolean'
         },
         value: {
-          type: 'number'
-        }
-      },
-      $extend: {
-        selectors: [values => values.foo.isDefault],
-        resolve: schema => isDefault => produce(schema, draftSchema => {
-          if (isDefault) {
-            draftSchema.properties.value.$resolver = 'calcBar';
+          type: 'number',
+          $modify: {
+            selectors: [values => values.bar.isDefault],
+            resolve: isDefault => {
+              if (isDefault) {
+                return schema => ({
+                  ...schema,
+                  $resolver: 'calcBar'
+                });
+              }
+            }
           }
-        });
+        }
       }
     }
   }
@@ -175,7 +180,7 @@ const initialSchema = {
 const resolvers = {
   calcBar: {
     selectors: [values => values.foo],
-    resolve: foo => isNumber(foo) ? foo + 2 : undefined
+    resolve: foo => (isNumber(foo) ? foo + 2 : undefined)
   }
 };
 
@@ -231,7 +236,7 @@ Selektor je funkce, která dostane vstupní argumenty: `values` a `external` (? 
 
 Selektor může být ale i [relativní JSON pointer](http://json-schema.org/latest/relative-json-pointer.html). V takovém případě je možné připojit hodnoty nezávisle na znalosti celého schématu (výhodné obzvlášť u komplexních polí).
 
-__Relativní JSON pointer__:
+**Relativní JSON pointer**:
 
 ```js
 const initialSchema = {
@@ -246,7 +251,7 @@ const initialSchema = {
         type: 'number',
         $resolver: {
           selectors: ['1/userDefinedValue'],
-          resolve: value => isNumber(value) ? value * 2 : undefined
+          resolve: value => (isNumber(value) ? value * 2 : undefined)
         }
       }
     }
@@ -269,7 +274,7 @@ const resolver = {
 Pokud jde ale o řešitele rozšiřující samotné schéma, tak zde je nejdříve provedeno první volání s původním schématem a teprve při druhém volání obdrží vstupní argumenty stanovené selektory. Je to z důvodu, že vývojář může provést i specifičtější úpravy ve schématu (např. změnu původních vlastností schématu apod.).
 
 ```js
-// $extend
+// $modify
 const resolver = {
   selectors: [getValueA, getValueB],
   resolve: relatedOriginalSchema => (valueA, valueB) => {}
@@ -284,10 +289,7 @@ Protože jsou všichni řešitelé voláni s každou změnu hodnoty ve formulá�
 import { createSelector } from 'reselect';
 
 const resolver = {
-  selectors: [
-    values => values.a,
-    values => values.b
-  ],
+  selectors: [values => values.a, values => values.b],
   resolve: (a, b) => ({
     sum: a + b,
     max: Math.max(a, b)
@@ -305,7 +307,7 @@ expect(firstOutput).toEqual({
 const secondOutput = resolve({ a: 1, b: 2 });
 
 // expect(..).toBe(..) proceeds strict/reference equality (===)
-expect(secondOutput).toBe(firstOutput); 
+expect(secondOutput).toBe(firstOutput);
 // => TRUE - because it uses the previous output
 ```
 
@@ -322,19 +324,19 @@ const initialSchema = {
           type: 'boolean'
         },
         value: {
-          type: 'number'
-        }
-      },
-      $extend: {
-        selectors: ['0/isDefault'],
-        resolve: originalSchema => isDefault => produce(
-          originalSchema, 
-          draftSchema => {
-            if (isDefault) {
-              draftSchema.properties.value.$resolver = 'calcBar'
+          type: 'number',
+          $modify: {
+            selectors: ['1/isDefault'],
+            resolve: isDefault => {
+              if (isDefault) {
+                return schema => ({
+                  ...schema,
+                  $resolver: 'calcBar'
+                });
+              }
             }
           }
-        )
+        }
       }
     }
   }
@@ -342,4 +344,5 @@ const initialSchema = {
 
 // TODO
 ```
+
 _TODO_

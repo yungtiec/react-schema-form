@@ -86,15 +86,17 @@ const initialSchema = {
 const resolvers = {
   resolveSchemaList: {
     selectors: [values => values.showList],
-    resolve: schema => showList => produce(schema, draftSchema => {
+    resolve: showList => {
       if (showList) {
-        draftSchema.properties.list = {
-          title: 'seznam',
-          type: 'string',
-          enum: ['foo', 'bar']
-        };
+        return produce(draftSchema => {
+          draftSchema.properties.list = {
+            title: 'seznam',
+            type: 'string',
+            enum: ['foo', 'bar']
+          };
+        });
       }
-    });
+    }
   }
 };
 

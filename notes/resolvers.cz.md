@@ -348,3 +348,46 @@ const initialSchema = {
 ```
 
 _TODO_
+
+## Ukázka rozšiřujících balíčků
+
+S tímto API by bylo možné vytvořit univerzální řešitele podmíněných schémat.
+
+```js
+const initialSchema = {
+  type: 'object',
+  properties: {
+    foo: {
+      type: 'number'
+    },
+    bar: {
+      type: 'object',
+      properties: {
+        isDefault: {
+          title: 'použít výchozí hodnotu?',
+          type: 'boolean'
+        },
+        value: {
+          type: 'number',
+          $default: 'calcBar',
+          $modify: 'defaultValue'
+        }
+      }
+    }
+  }
+};
+
+const resolvers = {
+  defaultValue: {
+    selectors: ['1/isDefault'],
+    resolve: isDefault => {
+      if (isDefault) {
+        return schema => ({
+          ...schema,
+          $resolver: schema.$default
+        });
+      }
+    }
+  }
+};
+```

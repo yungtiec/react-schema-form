@@ -1,4 +1,4 @@
-# Pluginy a reference na externí hodnoty (plugins and external values)
+# Pluginy a externí hodnoty (plugins and external values)
 
 ## Popis
 

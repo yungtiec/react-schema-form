@@ -124,7 +124,6 @@ describe('Rendering performance optimizations', () => {
       fields,
       templates,
       widgets,
-      definitions: {},
       formContext: {}
     };
     const uiSchema = {};

@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 
 import {
   getDefaultFormState,
-  retrieveSchema,
   shouldRender,
   toIdSchema,
   setState
@@ -35,9 +34,7 @@ export default class Form extends Component {
     const edit = typeof props.formData !== 'undefined';
     const liveValidate = props.liveValidate || this.props.liveValidate;
     const mustValidate = edit && !props.noValidate && liveValidate;
-    const { definitions } = schema;
-    const formData = getDefaultFormState(schema, props.formData, definitions);
-    const retrievedSchema = retrieveSchema(schema, definitions, formData);
+    const formData = getDefaultFormState(schema, props.formData);
 
     const { errors, errorSchema } = mustValidate
       ? this.validate(formData, schema)
@@ -46,9 +43,8 @@ export default class Form extends Component {
         errorSchema: state.errorSchema || {}
       };
     const idSchema = toIdSchema(
-      retrievedSchema,
+      schema,
       uiSchema['ui:rootFieldId'],
-      definitions,
       formData,
       props.idPrefix
     );
@@ -69,14 +65,8 @@ export default class Form extends Component {
 
   validate(formData, schema = this.props.schema) {
     const { validate, transformErrors } = this.props;
-    const { definitions } = this.getRegistry();
-    const resolvedSchema = retrieveSchema(schema, definitions, formData);
-    return validateFormData(
-      formData,
-      resolvedSchema,
-      validate,
-      transformErrors
-    );
+
+    return validateFormData(formData, schema, validate, transformErrors);
   }
 
   renderErrors(ErrorListTemplate) {
@@ -164,7 +154,6 @@ export default class Form extends Component {
       widgets: this.props.widgets,
       ArrayFieldTemplate: this.props.ArrayFieldTemplate,
       ObjectFieldTemplate: this.props.ObjectFieldTemplate,
-      definitions: this.props.schema.definitions || {},
       formContext: this.props.formContext || {}
     };
   }

@@ -11,7 +11,6 @@ import {
   isFixedItems,
   allowAdditionalItems,
   optionsList,
-  retrieveSchema,
   toIdSchema
 } from '../../utils';
 
@@ -58,16 +57,12 @@ class ArrayField extends Component {
 
   onAddClick = event => {
     event.preventDefault();
-    const { schema, formData, registry } = this.props;
-    const { definitions } = registry;
+    const { schema, formData } = this.props;
     let itemSchema = schema.items;
     if (isFixedItems(schema) && allowAdditionalItems(schema)) {
       itemSchema = schema.additionalItems;
     }
-    this.props.onChange([
-      ...formData,
-      getDefaultFormState(itemSchema, undefined, definitions)
-    ]);
+    this.props.onChange([...formData, getDefaultFormState(itemSchema)]);
   };
 
   onDropIndexClick = index => {
@@ -158,7 +153,6 @@ class ArrayField extends Component {
 
   render() {
     const { schema, uiSchema, idSchema, registry } = this.props;
-    const { definitions } = registry;
     if (!schema.hasOwnProperty('items')) {
       return (
         <UnsupportedField
@@ -171,10 +165,10 @@ class ArrayField extends Component {
     if (isFixedItems(schema)) {
       return this.renderFixedArray();
     }
-    if (isFilesArray(schema, uiSchema, definitions)) {
+    if (isFilesArray(schema, uiSchema)) {
       return this.renderFiles();
     }
-    if (isMultiSelect(schema, definitions)) {
+    if (isMultiSelect(schema)) {
       return this.renderMultiSelect();
     }
     return this.renderNormalArray();
@@ -199,23 +193,22 @@ class ArrayField extends Component {
       rawErrors
     } = this.props;
     const title = schema.title === undefined ? name : schema.title;
-    const { definitions, templates, formContext } = registry;
+    const { templates, formContext } = registry;
     const {
       ArrayFieldTemplate,
       TitleTemplate,
       DescriptionTemplate
     } = templates;
-    const itemsSchema = retrieveSchema(schema.items, definitions);
+    const itemsSchema = schema.items;
     const arrayProps = {
       canAdd: this.canAddItem(formData),
       items: formData.map((item, index) => {
-        const itemSchema = retrieveSchema(schema.items, definitions, item);
+        const itemSchema = schema.items;
         const itemErrorSchema = errorSchema ? errorSchema[index] : undefined;
         const itemIdPrefix = idSchema.$id + '_' + index;
         const itemIdSchema = toIdSchema(
           itemSchema,
           itemIdPrefix,
-          definitions,
           item,
           idPrefix
         );
@@ -259,7 +252,6 @@ class ArrayField extends Component {
       schema,
       idSchema,
       uiSchema,
-      formData,
       disabled,
       readonly,
       autofocus,
@@ -269,8 +261,8 @@ class ArrayField extends Component {
       rawErrors
     } = this.props;
     const items = this.props.formData;
-    const { widgets, definitions, formContext } = registry;
-    const itemsSchema = retrieveSchema(schema.items, definitions, formData);
+    const { widgets, formContext } = registry;
+    const itemsSchema = schema.items;
     const enumOptions = optionsList(itemsSchema);
     const { widget = 'select', ...options } = {
       ...getUiOptions(uiSchema),
@@ -355,13 +347,11 @@ class ArrayField extends Component {
     } = this.props;
     const title = schema.title || name;
     let items = this.props.formData;
-    const { definitions, templates, formContext } = registry;
+    const { templates, formContext } = registry;
     const { ArrayFieldTemplate: Template, TitleTemplate } = templates;
-    const itemSchemas = schema.items.map((item, index) =>
-      retrieveSchema(item, definitions, formData[index])
-    );
+    const itemSchemas = schema.items;
     const additionalSchema = allowAdditionalItems(schema)
-      ? retrieveSchema(schema.additionalItems, definitions, formData)
+      ? schema.additionalItems
       : null;
 
     if (!items || items.length < itemSchemas.length) {
@@ -380,13 +370,12 @@ class ArrayField extends Component {
       items: items.map((item, index) => {
         const additional = index >= itemSchemas.length;
         const itemSchema = additional
-          ? retrieveSchema(schema.additionalItems, definitions, item)
+          ? schema.additionalItems
           : itemSchemas[index];
         const itemIdPrefix = idSchema.$id + '_' + index;
         const itemIdSchema = toIdSchema(
           itemSchema,
           itemIdPrefix,
-          definitions,
           item,
           idPrefix
         );
@@ -516,7 +505,6 @@ if (process.env.NODE_ENV !== 'production') {
         PropTypes.oneOfType([PropTypes.func, PropTypes.object])
       ).isRequired,
       fields: PropTypes.objectOf(PropTypes.func).isRequired,
-      definitions: PropTypes.object.isRequired,
       formContext: PropTypes.object.isRequired
     })
   };

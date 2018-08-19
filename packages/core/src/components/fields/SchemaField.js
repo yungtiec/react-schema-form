@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 
 import {
   isMultiSelect,
-  retrieveSchema,
   toIdSchema,
   mergeObjects,
   getUiOptions,
@@ -47,6 +46,7 @@ function getFieldComponent(schema, uiSchema, idSchema, fields) {
 
 function SchemaFieldRender(props) {
   const {
+    schema,
     uiSchema,
     formData,
     errorSchema,
@@ -55,11 +55,10 @@ function SchemaFieldRender(props) {
     required,
     registry
   } = props;
-  const { definitions, formContext, fields, templates } = registry;
+  const { formContext, fields, templates } = registry;
   let idSchema = props.idSchema;
-  const schema = retrieveSchema(props.schema, definitions, formData);
   idSchema = mergeObjects(
-    toIdSchema(schema, null, definitions, formData, idPrefix),
+    toIdSchema(schema, null, formData, idPrefix),
     idSchema
   );
   const FieldComponent = getFieldComponent(schema, uiSchema, idSchema, fields);
@@ -76,9 +75,7 @@ function SchemaFieldRender(props) {
   const uiOptions = getUiOptions(uiSchema);
   let { label: displayLabel = true } = uiOptions;
   if (schema.type === 'array') {
-    displayLabel =
-      isMultiSelect(schema, definitions) ||
-      isFilesArray(schema, uiSchema, definitions);
+    displayLabel = isMultiSelect(schema) || isFilesArray(schema, uiSchema);
   }
   if (schema.type === 'object') {
     displayLabel = false;
@@ -196,7 +193,6 @@ if (process.env.NODE_ENV !== 'production') {
         PropTypes.oneOfType([PropTypes.func, PropTypes.object])
       ).isRequired,
       fields: PropTypes.objectOf(PropTypes.func).isRequired,
-      definitions: PropTypes.object.isRequired,
       ArrayFieldTemplate: PropTypes.func,
       ObjectFieldTemplate: PropTypes.func,
       FieldTemplate: PropTypes.func,

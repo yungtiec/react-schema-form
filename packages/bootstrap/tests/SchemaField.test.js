@@ -109,7 +109,6 @@ describe('SchemaField', () => {
        * but it works here. Maybe we can create custom matcher. ;)
        */
       expect(Object.keys(registry.widgets)).toEqual(Object.keys(widgets));
-      expect(registry.definitions).toEqual({});
       expect(typeof registry.fields).toBe('object');
       expect(registry.fields.SchemaField).toEqual(SchemaField);
       expect(registry.templates.TitleTemplate).toEqual(TitleTemplate);
@@ -119,27 +118,6 @@ describe('SchemaField', () => {
     });
 
     it('should use registered custom component for object', () => {
-      const uiSchema = { 'ui:field': 'myobject' };
-      const fields = { myobject: MyObject };
-
-      const { node } = createFormComponent({ schema, uiSchema, fields });
-
-      expect(node.querySelectorAll('#custom')).toHaveLength(1);
-    });
-
-    it('should handle referenced schema definitions', () => {
-      const schema = {
-        definitions: {
-          foobar: {
-            type: 'object',
-            properties: {
-              foo: { type: 'string' },
-              bar: { type: 'string' }
-            }
-          }
-        },
-        $ref: '#/definitions/foobar'
-      };
       const uiSchema = { 'ui:field': 'myobject' };
       const fields = { myobject: MyObject };
 
@@ -218,30 +196,6 @@ describe('SchemaField', () => {
       const { node } = createFormComponent({ schema });
 
       expect(node.querySelectorAll('#root_foo__description')).toHaveLength(1);
-    });
-
-    it('should render description if available from a referenced schema', () => {
-      // Overriding.
-      const schemaWithReference = {
-        type: 'object',
-        properties: {
-          foo: { $ref: '#/definitions/foo' },
-          bar: { type: 'string' }
-        },
-        definitions: {
-          foo: {
-            type: 'string',
-            description: 'A Foo field'
-          }
-        }
-      };
-      const { node } = createFormComponent({
-        schema: schemaWithReference
-      });
-
-      const matches = node.querySelectorAll('#root_foo__description');
-      expect(matches).toHaveLength(1);
-      expect(matches[0].textContent).toBe('A Foo field');
     });
 
     it('should not render description if not available from schema', () => {

@@ -1,6 +1,8 @@
 # Pluginy a reference na externí hodnoty (plugins and external values)
 
-### `plugins`
+## Komplexní ukázka
+
+### Použité pluginy `plugins`
 
 Pluginy slouží ke zpracování schématu před samotným renderováním formuláře.
 S jejich pomocí lze rozšířit schéma o podmínky podle standardu nebo vytvořit vlastní.
@@ -25,7 +27,7 @@ const plugins = {
 };
 ```
 
-### `schema` - komplexní ukázka
+### Schéma
 
 Následuje velice obsáhlá ukázka praktického použití pluginů (`$plugin`) a referencí na externí hodnoty (`$value`).
 

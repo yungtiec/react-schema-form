@@ -402,16 +402,13 @@ const initialSchema = {
 };
 ```
 
-### Procedure `derive`
+### Externí hodnoty získané vlastním výpočtem (external values = derived values)
 
 ```js
 import { createSelector } from 'reselect';
 
 import {} from './schema'; // values selectors are from here
 
-/*
-vrátím objekt s metodami: .update(values) a .get(key, path?)
-*/
 const initDerive = steps => {
   const keys = Object.keys(steps);
 

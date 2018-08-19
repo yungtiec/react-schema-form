@@ -2,7 +2,7 @@
 
 ## Komplexní ukázka
 
-- [pluginy](#použité-pluginy--plugins)
+- [pluginy](#použité-pluginy-plugins)
 - [schéma](#schéma)
 - [externí hodnoty](#externí-hodnoty-získané-vlastním-výpočtem-external-values--derived-values)
 

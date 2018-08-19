@@ -1,5 +1,17 @@
 # Pluginy a reference na externí hodnoty (plugins and external values)
 
+## Popis
+
+_TODO_:
+- co je JSON Schema
+  - jak souvisí s formulářem React Schema Form
+  - jak v něm vyřešit podmíněné entity - pluginy (`$plugin`)
+- zmínka o dynamických formulářích
+  - jak v nich vyřešit odvozené hodnoty - externí hodnoty s `$value`
+  - jak vytvořit komplexní výpočet
+- optimalizace
+  - jak předejít zbytečnému volání funkcí - memoize / reselect
+
 ## Komplexní ukázka
 
 - [pluginy](#použité-pluginy-plugins)

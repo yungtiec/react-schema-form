@@ -465,7 +465,7 @@ describe('StringField', () => {
         liveValidate: true
       });
 
-      fireEvent.change(node.querySelector('[type=datetime-local]'), {
+      Simulate.change(node.querySelector('[type=datetime-local]'), {
         target: { value: 'invalid' }
       });
 
@@ -604,7 +604,7 @@ describe('StringField', () => {
         liveValidate: true
       });
 
-      fireEvent.change(node.querySelector('[type=date]'), {
+      Simulate.change(node.querySelector('[type=date]'), {
         target: { value: 'invalid' }
       });
 

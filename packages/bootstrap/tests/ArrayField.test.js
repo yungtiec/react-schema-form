@@ -345,8 +345,7 @@ describe('ArrayField', () => {
       });
       const input = node.querySelector('#root_1');
 
-      input.value = '';
-      fireEvent.change(input);
+      fireEvent.change(input, { target: { value: '' } });
 
       expect(getInstance().state.formData).toEqual([1, null, 3]);
       expect(getInstance().state.errors).toHaveLength(1);
@@ -710,8 +709,8 @@ describe('ArrayField', () => {
         const checkbox1 = node.querySelectorAll('[type=checkbox]')[0];
         const checkbox3 = node.querySelectorAll('[type=checkbox]')[2];
 
-        fireEvent.change(checkbox1, { target: { checked: true } });
-        fireEvent.change(checkbox3, { target: { checked: true } });
+        fireEvent.click(checkbox1);
+        fireEvent.click(checkbox3);
 
         expect(getInstance().state.formData).toEqual(['foo', 'fuzz']);
       });

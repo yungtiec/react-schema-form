@@ -1,340 +1,418 @@
-# Řešitelé (resolvers)
+# Řešitelé a externí hodnoty (resolvers and external values)
 
-Standard [JSON Schema](http://json-schema.org/understanding-json-schema/index.html) v základu počítá s tím, že celé schéma bude v JSONu a proto podmíněné entity schématu je potřeba popsat, defacto, novým způsobem, který je značně omezen (oneOf, anyOf, ...), protože nemůžeme používat vlastní JS funkce.
+## Popis
 
-Nicméně v případě `react-schema-form` se nemusíme omezovat na samotné JSON s primitivními hodnotami (`string`, `number`, `boolean`), ale můžeme využít pro podmíněné entity přímo JS funkce.
+_TODO_:
 
-## Ukázky použití
+- [ ] co je JSON Schema
+  - [ ] jak souvisí s formulářem React Schema Form
+  - [ ] jak v něm vyřešit podmíněné entity -> řešitelé (`$resolve`)
+- [ ] zmínka o dynamických formulářích
+  - [ ] jak v nich vyřešit odvozené hodnoty -> externí hodnoty s `$value`
+  - [ ] jak vytvořit komplexní výpočet
+- [ ] optimalizace
+  - [ ] jak obecně předejít zbytečnému volání funkcí -> memoize
+  - [ ] jak to aplikovat na řešitele a výpočty -> reselect
+    - [ ] co jsou to selektory
+    - [ ] co jsou to relativní JSON pointery
 
-Rigidní schéma formuláře je popsáno stejně jako v JSON Schema:
+## Komplexní ukázka
 
-```js
-const schema = {
-  type: 'object',
-  properties: {
-    foo: {
-      type: 'string'
-    }
-  }
-};
-```
+- [řešitelé](#řešitelé-resolvers)
+- [schéma](#schéma)
+- [externí hodnoty](#externí-hodnoty-získané-vlastním-výpočtem-external-values--derived-values)
 
-### Podmíněné schéma
+### Řešitelé `resolvers`
 
-Pouze část, která je závislá na aktuálních hodnotách entit je popsána klíčovým slovem `$modify`:
+Řešitelé slouží ke zpracování schématu před samotným renderováním formuláře.
+S jejich pomocí lze rozšířit schéma o podmínky podle standardu nebo vytvořit vlastní.
 
-```js
-import produce from 'immer';
-
-const initialSchema = {
-  type: 'object',
-  properties: {
-    showList: {
-      title: 'ukázat seznam?',
-      type: 'boolean'
-    }
-  },
-  $modify: {
-    selectors: [values => values.showList],
-    resolve: showList => {
-      if (showList) {
-        return produce(draftSchema => {
-          draftSchema.properties.list = {
-            title: 'seznam',
-            type: 'string',
-            enum: ['foo', 'bar']
-          };
-        });
-      }
-    }
-  }
-};
-```
-
-Klíčové slovo `$modify` je objekt obsahující selektory z aktuálních hodnot (`$modify.selectors`), které se v daném pořadí vloží jako argumenty do řešitele (`$modify.resolve`). Výstup z řešitele se poté sloučí s existujícím schématem entity.
+**ukázka vlastních řešitelů**:
 
 ```js
-const resolve = initResolve({ initialSchema });
-const actualValues = {
-  showList: false
-};
-
-expect(resolve(actualValues)).toEqual({
-  schema: {
-    type: 'object',
-    properties: {
-      showList: {
-        title: 'ukázat seznam?',
-        type: 'boolean'
-      }
-    }
-  },
-  values: {
-    showList: false
-  }
-});
-```
-
-Klíčové slovo `$modify` může být název řešitele (`string`). V takovém případě je zapotřebí dodat objekt obsahující řešitele s daným názvem.
-
-```js
-const initialSchema = {
-  type: 'object',
-  $modify: 'resolveSchemaList'
-};
+import { createSelector } from 'reselect';
 
 const resolvers = {
-  resolveSchemaList: {
-    selectors: [values => values.showList],
-    resolve: showList => {
-      if (showList) {
-        return produce(draftSchema => {
-          draftSchema.properties.list = {
-            title: 'seznam',
-            type: 'string',
-            enum: ['foo', 'bar']
-          };
-        });
-      }
-    }
+  default: path => {
+    const selectStatus = translateJsoinPointer('1/default', path);
+    return createSelector(
+      selectStatus, // the value of schema.properties.default
+      _default => _default && { $value: undefined } // "return false" doesn't extend schema
+    );
+  },
+  extend: (path, options) => {
+    const selectors = appendSelectors(options.selectors, path);
+    return createSelector(
+      selectors,
+      (...args) => (areDefined(args) ? resolve(...args) : undefined)
+    );
   }
 };
-
-const resolve = initResolve({ resolvers, initialSchema });
-
-resolve(actualValues);
 ```
 
-### Odvozené hodnoty (derived values)
+### Schéma
 
-Pokud potřebujeme zobrazit hodnoty vypočtené z aktuálních hodnot ve formuláři, tak použijeme klíčové slovo `$resolver`:
-
-```js
-const initialSchema = {
-  type: 'object',
-  properties: {
-    a: { type: 'number' },
-    b: { type: 'number' },
-    sum: {
-      type: 'number',
-      $resolver: {
-        selectors: [values => values.a, values => values.b],
-        resolve: (a, b) => (isNumber(a) && isNumber(b) ? a + b : undefined)
-      }
-    }
-  }
-};
-
-const resolve = initResolve({ initialSchema });
-const actualValues = { a: 1, b: 2 };
-
-expect(resolve(actualValues)).toEqual({
-  schema: initialSchema,
-  values: {
-    a: 1,
-    b: 2,
-    sum: 3
-  }
-});
-```
-
-### Kombinace podmíněného schématu s odvozenými hodnotami
-
-V praxi můžeme narazit na formuláře, kde uživatel může využít výchozí hodnotu (odvozenou) nebo může zadat vlastní. V takovém případě bychom mohli napsat schéma v tomto tvaru:
+Následuje velice obsáhlá ukázka praktického použití řešitelů (`$resolve`) a referencí na externí hodnoty (`$value`).
 
 ```js
-import produce from 'immer';
+import {} from './constants'; // uppercased keys are from here
 
 const initialSchema = {
-  type: 'object',
-  properties: {
-    foo: {
-      title: 'hodnota Foo',
-      type: 'number'
-    },
-    bar: {
-      title: 'hodnota Bar',
-      type: 'object',
-      properties: {
-        isDefault: {
-          title: 'použít výchozí hodnotu?',
-          type: 'boolean'
-        },
-        value: {
-          type: 'number',
-          $modify: {
-            selectors: [values => values.bar.isDefault],
-            resolve: isDefault => {
-              if (isDefault) {
-                return schema => ({
-                  ...schema,
-                  $resolver: 'calcBar'
-                });
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-};
-
-const resolvers = {
-  calcBar: {
-    selectors: [values => values.foo],
-    resolve: foo => (isNumber(foo) ? foo + 2 : undefined)
-  }
-};
-
-const resolve = initResolve({ resolvers, initialSchema });
-const actualValues = {
-  foo: 1,
-  bar: { isDefault: true }
-};
-
-expect(resolve(actualValues)).toEqual({
-  schema: {
+  [DEMAND]: {
+    title: 'křivka odběru',
     type: 'object',
     properties: {
-      foo: {
-        title: 'hodnota Foo',
-        type: 'number'
+      [BUILDING]: {
+        title: 'typ budovy',
+        type: 'string',
+        enum: [RDC, BDC],
+        enumNames: [
+          'rodinný dům s centrálním ohřevem teplé vody',
+          'bytový dům s centrální ohřevem teplé vody'
+        ]
       },
-      bar: {
-        title: 'hodnota Bar',
+      [COLD_WATER]: {
+        title: 'teplota studené vody',
+        type: 'number',
+        minimum: 0,
+        maximum: 100,
+        default: 10
+      },
+      [HOT_WATER]: {
+        title: 'teplota teplé vody',
+        type: 'number',
+        minimum: 0,
+        maximum: 100,
+        default: 50
+      },
+      // external value
+      [UNIT]: {
+        title: 'měrná jednotka',
+        type: 'string',
+        $value: 'unit'
+      },
+      [COUNT]: {
+        title: 'počet měrných jednotek',
+        type: 'number',
+        minimum: 1
+      },
+      // external value and extended schema
+      [HOT_WATER_PER_UNIT]: {
+        title: 'denní potřeba TV na jednotku',
         type: 'object',
         properties: {
-          isDefault: {
+          default: {
             title: 'použít výchozí hodnotu?',
             type: 'boolean'
           },
           value: {
             type: 'number',
-            $resolver: 'calcFoo'
+            $value: 'hotWaterPerUnit',
+            $resolve: 'default'
+          }
+        }
+      },
+      // external value
+      [HEAT_DEMAND]: {
+        title: 'teoretická potřeba tepla',
+        type: 'number',
+        $value: 'heatDemand'
+      },
+      [DESIGN_DEMAND]: {
+        title: 'popis křivky odběru tepla (bez tepelných ztrát)',
+        type: 'object',
+        properties: {
+          // extended schema
+          active: {
+            title: 'aktivní profil křivky odběru tepla',
+            type: 'integer',
+            default: 1,
+            minimum: 1,
+            $resolve: [
+              'extend',
+              {
+                selectors: ['1/profiles'],
+                resolve: profiles => ({ maximum: profiles.length })
+              }
+            ]
+          },
+          profiles: {
+            type: 'array',
+            items: [
+              {
+                title: 'výchozí profil křivky odběru tepla',
+                type: 'object',
+                properties: {
+                  color: {
+                    title: 'barva křivky',
+                    type: 'string'
+                  },
+                  // external value
+                  sections: {
+                    $value: 'defaultDemandSections',
+
+                    title: 'úseky křivky',
+                    type: 'array',
+                    items: {
+                      title: 'úsek křivky',
+                      type: 'object',
+                      properties: {
+                        x: {
+                          title: 'čas',
+                          type: 'number'
+                        },
+                        y: {
+                          title: 'energie',
+                          type: 'number'
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            additionalItems: {
+              title: 'profil křivky odběru tepla',
+              type: 'object',
+              properties: {
+                color: {
+                  title: 'barva křivky',
+                  type: 'string'
+                },
+                points: {
+                  title: 'body křivky',
+                  type: 'array',
+                  items: {
+                    title: 'bod křivky',
+                    type: 'object',
+                    properties: {
+                      x: {
+                        title: 'čas',
+                        type: 'number'
+                      },
+                      y: {
+                        title: 'energie',
+                        type: 'number'
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
     }
   },
-  values: {
-    foo: 1,
-    bar: {
-      isDefault: true,
-      value: 3 // <= derived value!
-    }
-  }
-});
-```
-
-## Pod pokličkou (the core and the API)
-
-Při inicializaci se nacachují všichni _přímo_ zjistitelní řešitelé a následně se při každé aktualizaci hodnot zavolají popořadě s tím, že hodnoty aktualizované z předchozího řešitele se použijí jako vstupní hodnoty pro následujícího řešitele.
-
-_Přímo zjistitelní_ proto, protože podmíněné schéma může být rozšířeno o řešitele hodnoty (`$resolver`).
-
-### Selektory (`resolver.selectors`)
-
-Selektor je funkce, která dostane vstupní argumenty: `values` a `external` (? zatím nevím, jestli je to vhodné řešení závislosti na externích hodnotách).
-
-Selektor může být ale i [relativní JSON pointer](http://json-schema.org/latest/relative-json-pointer.html). V takovém případě je možné připojit hodnoty nezávisle na znalosti celého schématu (výhodné obzvlášť u komplexních polí).
-
-**Relativní JSON pointer**:
-
-```js
-const initialSchema = {
-  type: 'array',
-  items: {
+  [SUPPLY]: {
+    title: 'křivka dodávky',
     type: 'object',
     properties: {
-      userDefinedValue: {
-        type: 'number'
-      },
-      derivedValue: {
-        type: 'number',
-        $resolver: {
-          selectors: ['1/userDefinedValue'],
-          resolve: value => (isNumber(value) ? value * 2 : undefined)
+      [LOSS_FACTOR]: {
+        title: 'poměrný součinitel ztrát',
+        type: 'object',
+        properties: {
+          default: {
+            title: 'použít výchozí hodnotu',
+            type: 'boolean'
+          },
+          // extended schema and external value
+          value: {
+            title: 'hodnota',
+            type: 'number',
+            $value: 'lossFactor',
+            $resolve: 'default'
+          }
         }
-      }
-    }
-  }
-};
-```
-
-### Funkce řešitel (`resolver.resolve`)
-
-V případě řešitele pro odvozenou hodnotu jsou vstupní argumenty dány selektory (ve stejném pořadí).
-
-```js
-// $resolver
-const resolver = {
-  selectors: [getValueA, getValueB],
-  resolve: (valueA, valueB) => {}
-};
-```
-
-Pokud jde ale o řešitele rozšiřující samotné schéma, tak zde je nejdříve provedeno první volání s původním schématem a teprve při druhém volání obdrží vstupní argumenty stanovené selektory. Je to z důvodu, že vývojář může provést i specifičtější úpravy ve schématu (např. změnu původních vlastností schématu apod.).
-
-```js
-// $modify
-const resolver = {
-  selectors: [getValueA, getValueB],
-  resolve: relatedOriginalSchema => (valueA, valueB) => {}
-};
-```
-
-### Optimalizace
-
-Protože jsou všichni řešitelé voláni s každou změnu hodnoty ve formuláři a to i s absolutně nesouvisející, tak může dojít ke zpomalení procedury. V takovém případě je vhodné provést memoizaci funkcí. Tzn. že jakmile bude řešitel volán se stejnými hodnotami argumentů, tak se rovnou vrátí předchozí nacachovaný výstup z funkce.
-
-```js
-import { createSelector } from 'reselect';
-
-const resolver = {
-  selectors: [values => values.a, values => values.b],
-  resolve: (a, b) => ({
-    sum: a + b,
-    max: Math.max(a, b)
-  })
-};
-const resolve = createSelector(resolver.selectors, resolver.resolve);
-
-const firstOutput = resolve({ a: 1, b: 2 });
-
-expect(firstOutput).toEqual({
-  sum: 3,
-  max: 2
-});
-
-const secondOutput = resolve({ a: 1, b: 2 });
-
-// expect(..).toBe(..) proceeds strict/reference equality (===)
-expect(secondOutput).toBe(firstOutput);
-// => TRUE - because it uses the previous output
-```
-
-A protože memoizací docílíme navrácení předchozího výsledku, tak můžeme s výhodou využít i memoizace podmíněných řešitelů pro odvozené hodnoty (tzn. podmíněné schéma po úpravě rozšíří schéma o řešitele (`$resolver`) odvozené hodnoty).
-
-```js
-const initialSchema = {
-  type: 'object',
-  properties: {
-    foo: {
-      type: 'object',
-      properties: {
-        isDefault: {
-          type: 'boolean'
-        },
-        value: {
-          type: 'number',
-          $modify: {
-            selectors: ['1/isDefault'],
-            resolve: isDefault => {
-              if (isDefault) {
-                return schema => ({
-                  ...schema,
-                  $resolver: 'calcBar'
-                });
+      },
+      // external value
+      [HEAT_LOSS]: {
+        title: 'tepelné ztráty',
+        type: 'number',
+        $value: 'heatLoss'
+      },
+      // external value
+      [HEAT_DEMAND_WITH_LOSS]: {
+        title: 'celková potřeba tepla',
+        description: 'potřebné teplo se ztrátami',
+        type: 'number',
+        $value: 'heatDemandWithLoss'
+      },
+      [DESIGN_SUPPLY]: {
+        title: 'popis křivky dodávky tepla',
+        type: 'object',
+        properties: {
+          // extended schema
+          active: {
+            title: 'aktivní profil křivky dodávky tepla',
+            type: 'number',
+            default: 1,
+            minimum: 1,
+            $resolve: [
+              'extend',
+              {
+                selectors: ['1/profiles'],
+                resolve: profiles => ({ maximum: profiles.length })
+              }
+            ]
+          },
+          demandProfile: {
+            title: 'profil křivky odběru tepla',
+            type: 'object',
+            properties: {
+              // external value
+              color: {
+                title: 'barva křivky',
+                type: 'string',
+                $value: 'demandProfileColor'
+              },
+              // external value
+              points: {
+                $value: 'demandWithLossProfilePoints',
+                title: 'body křivky',
+                type: 'array',
+                items: {
+                  title: 'bod křivky',
+                  type: 'object',
+                  properties: {
+                    x: {
+                      title: 'čas',
+                      type: 'number'
+                    },
+                    y: {
+                      title: 'energie',
+                      type: 'number'
+                    }
+                  }
+                }
+              }
+            }
+          },
+          profiles: {
+            type: 'array',
+            items: [
+              {
+                title: 'výchozí profil křivky dodávky tepla',
+                type: 'object',
+                properties: {
+                  id: {
+                    type: 'string',
+                    $value: 'id',
+                    $hidden: true
+                  },
+                  color: {
+                    title: 'barva křivky',
+                    type: 'string'
+                  },
+                  offset: {
+                    title: 'odsazení křivky',
+                    type: 'number',
+                    default: 0.15
+                  },
+                  // external value
+                  points: {
+                    $value: 'defaultSupplyProfilePoints',
+                    title: 'body křivky',
+                    type: 'array',
+                    items: {
+                      title: 'bod křivky',
+                      type: 'object',
+                      properties: {
+                        x: {
+                          title: 'čas',
+                          type: 'number'
+                        },
+                        y: {
+                          title: 'energie',
+                          type: 'number'
+                        }
+                      }
+                    }
+                  },
+                  // external value
+                  [MAX_HEAT_DIFF]: {
+                    title:
+                      'maximální rozdíl tepla mezi křivkami odběru a dodávky',
+                    type: 'number',
+                    $value: 'maxHeatDiff'
+                  },
+                  // external value
+                  [VOLUME]: {
+                    title: 'požadovaný objem zásobníku',
+                    type: 'number',
+                    $value: 'volume'
+                  },
+                  // external value
+                  [POWER]: {
+                    title: 'požadovaný tepelný výkon zdroje tepla',
+                    type: 'number',
+                    $value: 'power'
+                  }
+                }
+              }
+            ],
+            additionalItems: {
+              title: 'profil křivky dodávky tepla',
+              type: 'object',
+              properties: {
+                color: {
+                  title: 'barva křivky',
+                  type: 'string'
+                },
+                offset: {
+                  title: 'odsazení křivky',
+                  type: 'number',
+                  default: 0.15
+                },
+                points: {
+                  title: 'body křivky',
+                  type: 'array',
+                  items: {
+                    title: 'bod křivky',
+                    type: 'object',
+                    properties: {
+                      x: {
+                        title: 'čas',
+                        type: 'number'
+                      },
+                      y: {
+                        title: 'energie',
+                        type: 'number',
+                        $resolve: [
+                          'extend',
+                          {
+                            selectors: [selectHeatDemandWithLoss, selectOffset],
+                            resolve: (heatDemandWithLoss, offset) => ({
+                              maximum: calcUpperBoundary(
+                                heatDemandWithLoss,
+                                offset
+                              )
+                            })
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                // external value
+                [MAX_HEAT_DIFF]: {
+                  title:
+                    'maximální rozdíl tepla mezi křivkami odběru a dodávky',
+                  type: 'number',
+                  $value: 'maxHeatDiff'
+                },
+                // external value
+                [VOLUME]: {
+                  title: 'požadovaný objem zásobníku',
+                  type: 'number',
+                  $value: 'volume'
+                },
+                // external value
+                [POWER]: {
+                  title: 'požadovaný tepelný výkon zdroje tepla',
+                  type: 'number',
+                  $value: 'power'
+                }
               }
             }
           }
@@ -343,51 +421,195 @@ const initialSchema = {
     }
   }
 };
-
-// TODO
 ```
 
-_TODO_
-
-## Ukázka rozšiřujících balíčků
-
-S tímto API by bylo možné vytvořit univerzální řešitele podmíněných schémat.
+### Externí hodnoty získané vlastním výpočtem (external values = derived values)
 
 ```js
-const initialSchema = {
-  type: 'object',
-  properties: {
-    foo: {
-      type: 'number'
-    },
-    bar: {
-      type: 'object',
-      properties: {
-        isDefault: {
-          title: 'použít výchozí hodnotu?',
-          type: 'boolean'
-        },
-        value: {
-          type: 'number',
-          $default: 'calcBar',
-          $modify: 'defaultValue'
+import { createSelector } from 'reselect';
+
+import {} from './schema'; // values selectors are from here
+
+const initDerive = steps => {
+  const keys = Object.keys(steps);
+
+  return {
+    calc,
+    get
+  };
+
+  function calc(values) {
+    return keys.reduce(
+      (acc, key) => {
+        const step = steps[key];
+        const maybeDerived = step(acc.values, acc.derived);
+        let derived;
+
+        if (typeof maybeDerived === 'function') {
+          steps[key] = maybeDerived;
+          derived = maybeDerived(acc.values, acc.derived);
+        } else {
+          derived = maybeDerived;
         }
-      }
+
+        return {
+          ...acc,
+          [key]: derived
+        };
+      },
+      { values, derived: {} }
+    );
+  }
+
+  function get(key, id, values) {
+    if (id) {
+      return values[key][id];
     }
+    return values[key];
   }
 };
 
-const resolvers = {
-  defaultValue: {
-    selectors: ['1/isDefault'],
-    resolve: isDefault => {
-      if (isDefault) {
-        return schema => ({
-          ...schema,
-          $resolver: schema.$default
+const stepsDemand = {
+  unit: createSelector(selectBuilding, getUnit),
+
+  heatDemand: createSelector(
+    selectCount,
+    selectHotWaterPerUnit,
+    selectColdWater,
+    selectHotWater,
+    (count, hotWaterPerUnit, coldWater, hotWater) => {
+      if (areDefined(count, hotWaterPerUnit, coldWater, hotWater)) {
+        return calc('(V * n * 1000 * 4186 * (tTV - tSV)) / (3600 * 1000)', {
+          V: hotWaterPerUnit,
+          n: count,
+          tTV: hotWater,
+          tSV: coldWater
         });
       }
     }
-  }
+  ),
+
+  hotWaterPerUnit: createSelector(
+    selectBuilding,
+    selectCount,
+    getHotWaterPerUnit
+  ),
+
+  defaultDemandSections: createSelector(
+    selectBuilding,
+    selectCount,
+    selectHeatDemand,
+    (building, count, heatDemand) => {
+      if (areDefined(building, count, heatDemand)) {
+        const profile = getProfile(building, count);
+        const sections = calcSections(profile, heatDemand);
+        return sections;
+      }
+    }
+  )
 };
+
+const stepsSupply = demand => {
+  const fromDemand = [demand.values, demand.derived];
+  const building = selectBuilding(...fromDemand);
+  const count = selectCount(...fromDemand);
+  const coldWater = selectColdWater(...fromDemand);
+  const hotWater = selectHotWater(...fromDemand);
+  const heatDemand = selectHeatDemand(...fromDemand);
+  const demandProfileColor = getDemandProfileColor(...fromDemand);
+  const demandProfilePoints = getDemandProfilePoints(...fromDemand);
+  const lossFactor = getLossFactor(building, count);
+
+  return {
+    lossFactor,
+
+    heatLoss: createSelector(selectLossFactor, lossFactor =>
+      calcHeatLoss(heatDemand, lossFactor)
+    ),
+
+    heatDemandWithLoss: createSelector(selectHeatLoss, heatLoss =>
+      calcHeatDemandWithLoss(heatDemand, heatLoss)
+    ),
+
+    demandProfileColor,
+
+    demandWithLossProfilePoints: createSelector(
+      selectHeatDemandWithLoss,
+      heatDemandWithLoss =>
+        calcDemandWithLossProfilePoints(demandProfilePoints, heatDemandWithLoss)
+    ),
+
+    defaultSupplyProfilePoints: createSelector(
+      selectDemandWithLossProfilePoints,
+      selectOffset,
+      calcDefaultSupplyProfilePoints
+    ),
+
+    maxHeatDiff: createInstanceSelector(selectProfiles, () =>
+      createSelector(
+        selectDemandWithLossProfilePoints,
+        selectSupplyPoints,
+        calcMaxHeatDiff
+      )
+    ),
+
+    volume: createInstanceSelector(selectProfiles, () =>
+      createSelector(selectMaxHeatDiff, maxHeatDiff =>
+        calcVolume(coldWater, hotWater, maxHeatDiff)
+      )
+    ),
+
+    power: createInstanceSelector(selectProfiles, () =>
+      createSelector(selectSupplyPoints, calcPower)
+    )
+  };
+};
+
+export const deriveDemand = initDerive(stepsDemand);
+export const deriveSupply = demand => initDerive(stepsSupply(demand));
+
+function createInstanceSelector(selectArray, makeSelector) {
+  return values => {
+    const initArray = selectArray(values, derived);
+    let cache = initArray.reduce(
+      (acc, item) => ({
+        ...acc,
+        [item.id]: makeSelector()
+      }),
+      {}
+    );
+
+    return (values, derived) => {
+      const array = selectArray(values, derived);
+      const output = {};
+
+      array.forEach((item, index) => {
+        if (!cache[item.id]) {
+          cache[item.id] = makeSelector();
+        }
+
+        output[item.id] = cache[item.id](values, derived, index, item.id);
+      });
+
+      return output;
+    };
+  };
+}
+
+function createCache(array, makeSelector, oldCache = {}) {
+  return array.reduce((acc, item) => {
+    let selector;
+
+    if (oldCache[item.id]) {
+      selector = oldCache[item.id];
+    } else {
+      selector = makeSelector();
+    }
+
+    return {
+      ...acc,
+      [item.id]: selector
+    };
+  }, {});
+}
 ```

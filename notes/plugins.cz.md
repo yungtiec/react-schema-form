@@ -2,6 +2,10 @@
 
 ## Komplexní ukázka
 
+- [pluginy](#použité-pluginy--plugins)
+- [schéma](#schéma)
+- [externí hodnoty](#externí-hodnoty-získané-vlastním-výpočtem-external-values--derived-values)
+
 ### Použité pluginy `plugins`
 
 Pluginy slouží ke zpracování schématu před samotným renderováním formuláře.

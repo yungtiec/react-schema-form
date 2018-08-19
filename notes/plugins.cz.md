@@ -5,12 +5,15 @@
 _TODO_:
 - [ ] co je JSON Schema
   - [ ] jak souvisí s formulářem React Schema Form
-  - [ ] jak v něm vyřešit podmíněné entity - pluginy (`$plugin`)
+  - [ ] jak v něm vyřešit podmíněné entity -> pluginy (`$plugin`)
 - [ ] zmínka o dynamických formulářích
-  - [ ] jak v nich vyřešit odvozené hodnoty - externí hodnoty s `$value`
+  - [ ] jak v nich vyřešit odvozené hodnoty -> externí hodnoty s `$value`
   - [ ] jak vytvořit komplexní výpočet
 - [ ] optimalizace
-  - [ ] jak předejít zbytečnému volání funkcí - memoize / reselect
+  - [ ] jak obecně předejít zbytečnému volání funkcí -> memoize
+  - [ ] jak to aplikovat na pluginy a výpočty -> reselect
+    - [ ] co jsou to selektory
+    - [ ] co jsou to relativní JSON pointery
 
 ## Komplexní ukázka
 

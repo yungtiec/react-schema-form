@@ -1,4 +1,4 @@
-# Pluginy a reference na externí hodnoty (plugins and values references)
+# Pluginy a reference na externí hodnoty (plugins and external values)
 
 ### `plugins`
 
@@ -60,7 +60,7 @@ const initialSchema = {
         maximum: 100,
         default: 50
       },
-      // derived value
+      // external value
       [UNIT]: {
         title: 'měrná jednotka',
         type: 'string',
@@ -71,7 +71,7 @@ const initialSchema = {
         type: 'number',
         minimum: 1
       },
-      // derived value and extended schema
+      // external value and extended schema
       [HOT_WATER_PER_UNIT]: {
         title: 'denní potřeba TV na jednotku',
         type: 'object',
@@ -87,7 +87,7 @@ const initialSchema = {
           }
         }
       },
-      // derived value
+      // external value
       [HEAT_DEMAND]: {
         title: 'teoretická potřeba tepla',
         type: 'number',
@@ -122,7 +122,7 @@ const initialSchema = {
                     title: 'barva křivky',
                     type: 'string'
                   },
-                  // derived value
+                  // external value
                   sections: {
                     $value: 'defaultDemandSections',
 
@@ -191,7 +191,7 @@ const initialSchema = {
             title: 'použít výchozí hodnotu',
             type: 'boolean'
           },
-          // extended schema and derived value
+          // extended schema and external value
           value: {
             title: 'hodnota',
             type: 'number',
@@ -200,13 +200,13 @@ const initialSchema = {
           }
         }
       },
-      // derived value
+      // external value
       [HEAT_LOSS]: {
         title: 'tepelné ztráty',
         type: 'number',
         $value: 'heatLoss'
       },
-      // derived value
+      // external value
       [HEAT_DEMAND_WITH_LOSS]: {
         title: 'celková potřeba tepla',
         description: 'potřebné teplo se ztrátami',
@@ -235,13 +235,13 @@ const initialSchema = {
             title: 'profil křivky odběru tepla',
             type: 'object',
             properties: {
-              // derived value
+              // external value
               color: {
                 title: 'barva křivky',
                 type: 'string',
                 $value: 'demandProfileColor'
               },
-              // derived value
+              // external value
               points: {
                 $value: 'demandWithLossProfilePoints',
                 title: 'body křivky',
@@ -284,7 +284,7 @@ const initialSchema = {
                     type: 'number',
                     default: 0.15
                   },
-                  // derived value
+                  // external value
                   points: {
                     $value: 'defaultSupplyProfilePoints',
                     title: 'body křivky',
@@ -304,20 +304,20 @@ const initialSchema = {
                       }
                     }
                   },
-                  // derived value
+                  // external value
                   [MAX_HEAT_DIFF]: {
                     title:
                       'maximální rozdíl tepla mezi křivkami odběru a dodávky',
                     type: 'number',
                     $value: 'maxHeatDiff'
                   },
-                  // derived value
+                  // external value
                   [VOLUME]: {
                     title: 'požadovaný objem zásobníku',
                     type: 'number',
                     $value: 'volume'
                   },
-                  // derived value
+                  // external value
                   [POWER]: {
                     title: 'požadovaný tepelný výkon zdroje tepla',
                     type: 'number',
@@ -373,20 +373,20 @@ const initialSchema = {
                     }
                   }
                 },
-                // derived value
+                // external value
                 [MAX_HEAT_DIFF]: {
                   title:
                     'maximální rozdíl tepla mezi křivkami odběru a dodávky',
                   type: 'number',
                   $value: 'maxHeatDiff'
                 },
-                // derived value
+                // external value
                 [VOLUME]: {
                   title: 'požadovaný objem zásobníku',
                   type: 'number',
                   $value: 'volume'
                 },
-                // derived value
+                // external value
                 [POWER]: {
                   title: 'požadovaný tepelný výkon zdroje tepla',
                   type: 'number',

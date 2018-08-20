@@ -439,26 +439,28 @@ const initDerive = steps => {
   };
 
   function calc(values) {
-    return keys.reduce(
-      (acc, key) => {
-        const step = steps[key];
-        const maybeDerived = step(acc.values, acc.derived);
-        let derived;
+    return keys.reduce((acc, key) => {
+      const step = steps[key];
+      
+      if (typeof step !== 'function') {
+        return { ...acc, [key]: step };
+      }
 
-        if (typeof maybeDerived === 'function') {
-          steps[key] = maybeDerived;
-          derived = maybeDerived(acc.values, acc.derived);
-        } else {
-          derived = maybeDerived;
-        }
+      const maybeDerived = step(acc.values, acc.derived);
+      let derived;
 
-        return {
-          ...acc,
-          [key]: derived
-        };
-      },
-      { values, derived: {} }
-    );
+      if (typeof maybeDerived === 'function') {
+        steps[key] = maybeDerived;
+        derived = maybeDerived(acc.values, acc.derived);
+      } else {
+        derived = maybeDerived;
+      }
+
+      return {
+        ...acc,
+        [key]: derived
+      };
+    }, {});
   }
 
   function get(key, id, values) {

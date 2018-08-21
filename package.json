@@ -6,17 +6,21 @@
   ],
   "license": "MIT",
   "scripts": {
-    "readme": "toctoc README.md -w",
-    "format": "lerna exec --stream --parallel -- prettier-eslint --write \"**/*.js\"",
+    "format": "lerna exec --stream --parallel -- prettier-eslint --write \"{src,tests}/**/*.js\"",
+    "lint": "eslint .",
     "clean:pkg": "lerna exec --stream --parallel --ignore playground -- rimraf dist lib",
     "babel:pkg": "lerna exec --stream --parallel --ignore playground -- babel src --out-dir lib",
     "webpack:pkg": "lerna exec --stream --parallel --ignore playground -- webpack --config ../webpack.config.js",
     "build:pkg": "run-s clean:pkg babel:pkg webpack:pkg",
     "build:playground": "cd playground && npm run build",
-    "build": "run-s build:pkg build:playground",
+    "build:readme": "toctoc README.md -w",
+    "build": "run-s build:pkg build:playground build:readme",
     "start": "cd playground && npm start",
     "test": "jest --env=jsdom",
-    "tdd": "jest --env=jsdom --watch"
+    "tdd": "jest --env=jsdom --watch",
+    "preversion": "run-s build format lint",
+    "npm": "run-s build:pkg build:readme",
+    "gh-pages": "cd playground && npm run gh-pages"
   },
   "husky": {
     "hooks": {
@@ -41,7 +45,7 @@
     ]
   },
   "engines": {
-    "node": ">=6",
+    "node": ">=8",
     "yarn": ">=1"
   },
   "devDependencies": {

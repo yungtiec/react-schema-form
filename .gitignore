@@ -4,6 +4,9 @@ lib
 
 .cache
 
+.directory
+.vscode
+
 npm-debug.log
 lerna-debug.log
 package-lock.json

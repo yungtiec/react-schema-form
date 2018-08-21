@@ -13,7 +13,7 @@ A [live playground](https://MatejMazur.github.io/react-schema-form/) is hosted o
 
   - [Philosophy](#philosophy)
   - [Installation](#installation)
-     - [As a npm-based project dependency (themed)](#as-a-npm-based-project-dependency-themed)
+     - [As a npm-based project dependency](#as-a-npm-based-project-dependency)
   - [Usage (with Bootstrap)](#usage-with-bootstrap)
      - [Form initialization](#form-initialization)
      - [Form event handlers](#form-event-handlers)
@@ -101,7 +101,7 @@ A [live playground](https://MatejMazur.github.io/react-schema-form/) is hosted o
      - [Releasing](#releasing)
   - [FAQ](#faq)
      - [Q: Does rjsf support oneOf, anyOf, multiple types in an array, etc.?](#q-does-rjsf-support-oneof-anyof-multiple-types-in-an-array-etc)
-     - [Q: Does react-schema-form support Material, Ant-Design, Foundation, or [some other specific widget library or frontend style]? (YES!)](#q-does-react-schema-form-support-material-ant-design-foundation-or-some-other-specific-widget-library-or-frontend-style)
+     - [Q: Does react-schema-form support Material, Ant-Design, Foundation, or [some other specific widget library or frontend style]?](#q-does-react-schema-form-support-material-ant-design-foundation-or-some-other-specific-widget-library-or-frontend-style)
      - [Q: Is there a way to &quot;collapse&quot; fields, for instance to show/hide individual fields?](#q-is-there-a-way-to-collapse-fields-for-instance-to-show-hide-individual-fields)
   - [License](#license)
 

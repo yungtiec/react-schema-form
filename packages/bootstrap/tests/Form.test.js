@@ -1364,7 +1364,7 @@ describe('Form', () => {
         }
       };
 
-      it.skip('should only show error for property in selected branch', () => {
+      it('should only show error for property in selected branch', () => {
         const { getInstance, node } = createFormComponent({
           schema,
           liveValidate: true
@@ -1381,7 +1381,7 @@ describe('Form', () => {
         });
       });
 
-      it.skip('should only show errors for properties in selected branch', () => {
+      it('should only show errors for properties in selected branch', () => {
         const { getInstance, node } = createFormComponent({
           schema,
           liveValidate: true,

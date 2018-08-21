@@ -1,15 +1,15 @@
 /*eslint no-console: off*/
 import React, { Component } from 'react';
 import { render } from 'react-dom';
-import { UnControlled as CodeMirror } from 'react-codemirror2';
+// import { UnControlled as CodeMirror } from 'react-codemirror2';
 import 'codemirror/mode/javascript/javascript';
 
 import { shouldRender } from '@react-schema-form/core/src/utils';
 import Form from '@react-schema-form/bootstrap';
 
 import { samples } from './samples';
-import CheckMark from './components/icons/Checkmark';
-import Cross from './components/icons/Cross';
+// import CheckMark from './components/icons/Checkmark';
+// import Cross from './components/icons/Cross';
 
 // Import a few CodeMirror themes; these are used to match alternative
 // bootstrap ones.
@@ -23,108 +23,94 @@ import 'codemirror/theme/monokai.css';
 import 'codemirror/theme/eclipse.css';
 
 const log = type => console.log.bind(console, type);
-const fromJson = json => JSON.parse(json);
-const toJson = val => JSON.stringify(val, null, 2);
+// const fromJson = json => JSON.parse(json);
+// const toJson = val => JSON.stringify(val, null, 2);
 const liveValidateSchema = { type: 'boolean', title: 'Live validation' };
-const cmOptions = {
-  theme: 'default',
-  height: 'auto',
-  viewportMargin: Infinity,
-  mode: {
-    name: 'javascript',
-    json: true,
-    statementIndent: 2
-  },
-  lineNumbers: true,
-  lineWrapping: true,
-  indentWithTabs: false,
-  tabSize: 2
-};
+// const cmOptions = {
+//   theme: 'default',
+//   height: 'auto',
+//   viewportMargin: Infinity,
+//   mode: {
+//     name: 'javascript',
+//     json: true,
+//     statementIndent: 2
+//   },
+//   lineNumbers: true,
+//   lineWrapping: true,
+//   indentWithTabs: false,
+//   tabSize: 2
+// };
 const themes = {
   default: {
     stylesheet:
-      '//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'
+      '//stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css'
   },
   cerulean: {
     stylesheet:
-      '//cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.6/cerulean/bootstrap.min.css'
+      '//stackpath.bootstrapcdn.com/bootswatch/4.1.1/cerulean/bootstrap.min.css'
   },
   cosmo: {
     stylesheet:
-      '//cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.6/cosmo/bootstrap.min.css'
+      '//stackpath.bootstrapcdn.com/bootswatch/4.1.1/cosmo/bootstrap.min.css'
   },
   cyborg: {
     stylesheet:
-      '//cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.6/cyborg/bootstrap.min.css',
+      '//stackpath.bootstrapcdn.com/bootswatch/4.1.1/cyborg/bootstrap.min.css',
     editor: 'blackboard'
   },
   darkly: {
     stylesheet:
-      '//cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.6/darkly/bootstrap.min.css',
+      '//stackpath.bootstrapcdn.com/bootswatch/4.1.1/darkly/bootstrap.min.css',
     editor: 'mbo'
   },
   flatly: {
     stylesheet:
-      '//cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.6/flatly/bootstrap.min.css',
+      '//stackpath.bootstrapcdn.com/bootswatch/4.1.1/flatly/bootstrap.min.css',
     editor: 'ttcn'
   },
   journal: {
     stylesheet:
-      '//cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.6/journal/bootstrap.min.css'
+      '//stackpath.bootstrapcdn.com/bootswatch/4.1.1/journal/bootstrap.min.css'
   },
   lumen: {
     stylesheet:
-      '//cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.6/lumen/bootstrap.min.css'
+      '//stackpath.bootstrapcdn.com/bootswatch/4.1.1/lumen/bootstrap.min.css'
   },
-  paper: {
+  litera: {
     stylesheet:
-      '//cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.6/paper/bootstrap.min.css'
-  },
-  readable: {
-    stylesheet:
-      '//cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.6/readable/bootstrap.min.css'
+      '//stackpath.bootstrapcdn.com/bootswatch/4.1.1/litera/bootstrap.min.css'
   },
   sandstone: {
     stylesheet:
-      '//cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.6/sandstone/bootstrap.min.css',
+      '//stackpath.bootstrapcdn.com/bootswatch/4.1.1/sandstone/bootstrap.min.css',
     editor: 'solarized'
   },
   simplex: {
     stylesheet:
-      '//cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.6/simplex/bootstrap.min.css',
+      '//stackpath.bootstrapcdn.com/bootswatch/4.1.1/simplex/bootstrap.min.css',
     editor: 'ttcn'
   },
   slate: {
     stylesheet:
-      '//cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.6/slate/bootstrap.min.css',
+      '//stackpath.bootstrapcdn.com/bootswatch/4.1.1/slate/bootstrap.min.css',
     editor: 'monokai'
   },
   spacelab: {
     stylesheet:
-      '//cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.6/spacelab/bootstrap.min.css'
-  },
-  'solarized-dark': {
-    stylesheet:
-      '//cdn.rawgit.com/aalpern/bootstrap-solarized/master/bootstrap-solarized-dark.css',
-    editor: 'dracula'
-  },
-  'solarized-light': {
-    stylesheet:
-      '//cdn.rawgit.com/aalpern/bootstrap-solarized/master/bootstrap-solarized-light.css',
-    editor: 'solarized'
+      '//stackpath.bootstrapcdn.com/bootswatch/4.1.1/spacelab/bootstrap.min.css'
   },
   superhero: {
     stylesheet:
-      '//cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.6/superhero/bootstrap.min.css',
+      '//stackpath.bootstrapcdn.com/bootswatch/4.1.1/superhero/bootstrap.min.css',
     editor: 'dracula'
   },
   united: {
     stylesheet:
-      '//cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.6/united/bootstrap.min.css'
+      '//stackpath.bootstrapcdn.com/bootswatch/4.1.1/united/bootstrap.min.css'
   },
   yeti: {
     stylesheet:
-      '//cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.6/yeti/bootstrap.min.css',
+      '//stackpath.bootstrapcdn.com/bootswatch/4.1.1/yeti/bootstrap.min.css',
     editor: 'eclipse'
   }
 };
@@ -179,49 +165,49 @@ class GeoPosition extends Component {
   }
 }
 
-class Editor extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { valid: true, code: props.code };
-  }
+// class Editor extends Component {
+//   constructor(props) {
+//     super(props);
+//     this.state = { valid: true, code: props.code };
+//   }
 
-  componentWillReceiveProps(props) {
-    this.setState({ valid: true, code: props.code });
-  }
+//   componentWillReceiveProps(props) {
+//     this.setState({ valid: true, code: props.code });
+//   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    return shouldRender(this, nextProps, nextState);
-  }
+//   shouldComponentUpdate(nextProps, nextState) {
+//     return shouldRender(this, nextProps, nextState);
+//   }
 
-  onCodeChange = (editor, metadata, code) => {
-    this.setState({ valid: true, code });
-    setImmediate(() => {
-      try {
-        this.props.onChange(fromJson(this.state.code));
-      } catch (err) {
-        this.setState({ valid: false, code });
-      }
-    });
-  };
+//   onCodeChange = (editor, metadata, code) => {
+//     this.setState({ valid: true, code });
+//     setImmediate(() => {
+//       try {
+//         this.props.onChange(fromJson(this.state.code));
+//       } catch (err) {
+//         this.setState({ valid: false, code });
+//       }
+//     });
+//   };
 
-  render() {
-    const { title, theme } = this.props;
-    return (
-      <div className="card mb-4">
-        <div className="card-header">
-          {this.state.valid ? <CheckMark /> : <Cross />}
-          {' ' + title}
-        </div>
-        <CodeMirror
-          value={this.state.code}
-          onChange={this.onCodeChange}
-          autoCursor={false}
-          options={Object.assign({}, cmOptions, { theme })}
-        />
-      </div>
-    );
-  }
-}
+//   render() {
+//     const { title, theme } = this.props;
+//     return (
+//       <div className="card mb-4">
+//         <div className="card-header">
+//           {this.state.valid ? <CheckMark /> : <Cross />}
+//           {' ' + title}
+//         </div>
+//         <CodeMirror
+//           value={this.state.code}
+//           onChange={this.onCodeChange}
+//           autoCursor={false}
+//           options={Object.assign({}, cmOptions, { theme })}
+//         />
+//       </div>
+//     );
+//   }
+// }
 
 class Selector extends Component {
   constructor(props) {
@@ -403,7 +389,7 @@ class App extends Component {
       liveValidate,
       validate,
       theme,
-      editor,
+      // editor,
       templates,
       transformErrors
     } = this.state;
@@ -433,7 +419,7 @@ class App extends Component {
         </div>
         <div className="row">
           <div className="col-md-7">
-            <Editor
+            {/* <Editor
               title="JSONSchema"
               theme={editor}
               code={toJson(schema)}
@@ -456,7 +442,7 @@ class App extends Component {
                   onChange={this.onFormDataEdited}
                 />
               </div>
-            </div>
+            </div> */}
           </div>
           <div className="col-md-5 mb-3">
             {this.state.form && (

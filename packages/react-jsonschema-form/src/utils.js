@@ -513,7 +513,11 @@ function withExactlyOneSubschema(
     return schema;
   }
   const subschema = validSubschemas[0];
-  const { ...dependentSubschema } = subschema.properties;
+  const {
+    /*eslint-disable-next-line*/
+    [dependencyKey]: conditionPropertySchema,
+    ...dependentSubschema
+  } = subschema.properties;
   const dependentSchema = { ...subschema, properties: dependentSubschema };
   return mergeSchemas(
     schema,

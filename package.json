@@ -6,6 +6,7 @@
   ],
   "license": "MIT",
   "scripts": {
+    "readme": "toctoc README.md -w",
     "format": "lerna exec --stream --parallel -- prettier-eslint --write \"**/*.js\"",
     "clean:pkg": "lerna exec --stream --parallel --ignore playground -- rimraf dist lib",
     "babel:pkg": "lerna exec --stream --parallel --ignore playground -- babel src --out-dir lib",
@@ -69,6 +70,7 @@
     "react-dom": "^16.4.2",
     "react-testing-library": "^5.0.0",
     "rimraf": "^2.6.2",
+    "toctoc": "^0.3.0",
     "webpack": "^4.17.0",
     "webpack-command": "^0.4.1",
     "webpack-node-externals": "^1.7.2"

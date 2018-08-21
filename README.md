@@ -3,7 +3,16 @@
 A simple [React](http://facebook.github.io/react/) library capable of building HTML forms out of a [JSON schema](http://json-schema.org/).
 The core of the library is **UI agnostic** so you can use one of the [already built themes](/packages) or you can build your own!
 
-It's based on the great library [react-jsonschema-form](https://github.com/mozilla-services/react-jsonschema-form) (rjsf). The main difference is in the modularization of this library so you can use custom UI components (UI agnostic)! 
+It's based on the great library [react-jsonschema-form](https://github.com/mozilla-services/react-jsonschema-form) (rjsf). The main difference is in the modularization of this library so you can use custom UI components (UI agnostic). Currently there is only one offical theme package with Bootstrap 4 (`@react-schema-form/bootstrap`).
+
+If you want to replace rjsf with this library then you just need change imports of `Form` in your code:
+
+```diff
+- import Form from 'react-jsonschema-form';
++ import Form from '@react-schema-form/boostrap';
+```
+
+That's it! But the true power comes with the ability to use completely different UI components!
 
 A [live playground](https://MatejMazur.github.io/react-schema-form/) is hosted on gh-pages.
 

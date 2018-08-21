@@ -1,12 +1,10 @@
 import React from 'react';
 import { Simulate } from 'react-dom/test-utils';
-import { fireEvent, cleanup } from 'react-testing-library';
+import { fireEvent } from 'react-testing-library';
 
 import { createFormComponent, suppressLogs } from './test_utils';
 
 describe('ArrayField', () => {
-  afterEach(cleanup);
-
   const CustomComponent = props => {
     return <div id="custom">{props.rawErrors}</div>;
   };
@@ -347,8 +345,7 @@ describe('ArrayField', () => {
       });
       const input = node.querySelector('#root_1');
 
-      input.value = '';
-      fireEvent.change(input);
+      fireEvent.change(input, { target: { value: '' } });
 
       expect(getInstance().state.formData).toEqual([1, null, 3]);
       expect(getInstance().state.errors).toHaveLength(1);
@@ -699,9 +696,9 @@ describe('ArrayField', () => {
       it('should render the expected labels', () => {
         const { queryByLabelText } = createFormComponent({ schema, uiSchema });
 
-        expect(queryByLabelText('foo')).toBeInTheDOM();
-        expect(queryByLabelText('bar')).toBeInTheDOM();
-        expect(queryByLabelText('fuzz')).toBeInTheDOM();
+        expect(queryByLabelText('foo')).toBeInTheDocument();
+        expect(queryByLabelText('bar')).toBeInTheDocument();
+        expect(queryByLabelText('fuzz')).toBeInTheDocument();
       });
 
       it('should handle a change event', () => {
@@ -712,10 +709,8 @@ describe('ArrayField', () => {
         const checkbox1 = node.querySelectorAll('[type=checkbox]')[0];
         const checkbox3 = node.querySelectorAll('[type=checkbox]')[2];
 
-        checkbox1.checked = true;
-        fireEvent.change(checkbox1);
-        checkbox3.checked = true;
-        fireEvent.change(checkbox3);
+        fireEvent.click(checkbox1);
+        fireEvent.click(checkbox3);
 
         expect(getInstance().state.formData).toEqual(['foo', 'fuzz']);
       });
@@ -1056,10 +1051,8 @@ describe('ArrayField', () => {
         'fieldset .field-number input[type=text]'
       );
 
-      strInput.value = 'bar';
-      fireEvent.change(strInput);
-      numInput.value = '101';
-      fireEvent.change(numInput);
+      fireEvent.change(strInput, { target: { value: 'bar' } });
+      fireEvent.change(numInput, { target: { value: '101' } });
 
       expect(getInstance().state.formData).toEqual(['bar', 101]);
     });
@@ -1170,10 +1163,8 @@ describe('ArrayField', () => {
 
         inputs = queryAllByLabelText(/Additional item/);
 
-        inputs[0].value = 'bar';
-        fireEvent.change(inputs[0]);
-        inputs[1].value = 'baz';
-        fireEvent.change(inputs[1]);
+        fireEvent.change(inputs[0], { target: { value: 'bar' } });
+        fireEvent.change(inputs[1], { target: { value: 'baz' } });
 
         expect(getInstance().state.formData).toEqual([1, 2, 'bar', 'baz']);
       });

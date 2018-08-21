@@ -1,13 +1,10 @@
 import React from 'react';
-import { cleanup } from 'react-testing-library';
 
 import DescriptionTemplate from 'react-jsonschema-form-bootstrap/src/components/templates/DescriptionTemplate';
 
 import { createComponent } from './test_utils';
 
 describe('DescriptionTemplate', () => {
-  afterEach(cleanup);
-
   // For some reason, stateless components needs to be wrapped into a stateful
   // one to be rendered into the document.
   class DescriptionTemplateWrapper extends React.Component {

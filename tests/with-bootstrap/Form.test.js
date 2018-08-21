@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  render,
-  cleanup,
-  fireEvent,
-  wait,
-  within
-} from 'react-testing-library';
+import { render, fireEvent, wait, within } from 'react-testing-library';
 
 import BaseForm from 'react-jsonschema-form/src';
 import theme from 'react-jsonschema-form-bootstrap/src';
@@ -13,11 +7,6 @@ import { createFormComponent, suppressLogs } from './test_utils';
 
 describe('Form', () => {
   const Form = props => <BaseForm theme={theme} {...props} />;
-  /**
-   * We need cleanup after each render()
-   * until this issue https://github.com/facebook/react/issues/2043 will be solved.
-   */
-  afterEach(cleanup);
 
   describe('Empty schema', () => {
     it('should render a form tag', () => {
@@ -29,7 +18,7 @@ describe('Form', () => {
     it('should render a submit button', () => {
       const { queryByText } = createFormComponent({ schema: {} });
 
-      expect(queryByText('Submit')).toBeInTheDOM();
+      expect(queryByText('Submit')).toBeInTheDocument();
     });
 
     it('should render children buttons', () => {
@@ -41,8 +30,8 @@ describe('Form', () => {
         </Form>
       );
 
-      expect(queryByText('Submit')).toBeInTheDOM();
-      expect(queryByText('Another submit')).toBeInTheDOM();
+      expect(queryByText('Submit')).toBeInTheDocument();
+      expect(queryByText('Another submit')).toBeInTheDocument();
     });
   });
 
@@ -190,7 +179,7 @@ describe('Form', () => {
 
     it('should use the provided field template', () => {
       const { queryByTestId } = renderForm();
-      expect(queryByTestId('my-template')).toBeInTheDOM();
+      expect(queryByTestId('my-template')).toBeInTheDocument();
     });
 
     it('should use the provided template for labels', () => {
@@ -208,7 +197,7 @@ describe('Form', () => {
 
     it('should pass rawDescription as a string', () => {
       const { queryByTestId } = renderForm();
-      expect(queryByTestId('raw-description')).toBeInTheDOM();
+      expect(queryByTestId('raw-description')).toBeInTheDocument();
     });
 
     it('should pass rawErrors as an array of strings', () => {
@@ -218,7 +207,7 @@ describe('Form', () => {
 
     it('should pass help as the string', () => {
       const { getByText } = renderForm();
-      expect(getByText('this is help')).toBeInTheDOM();
+      expect(getByText('this is help')).toBeInTheDocument();
     });
   });
 
@@ -255,7 +244,7 @@ describe('Form', () => {
 
       const { queryByText } = createFormComponent({ schema });
 
-      expect(queryByText('TestDef')).toBeInTheDOM();
+      expect(queryByText('TestDef')).toBeInTheDocument();
     });
 
     it('should handle multiple schema definition references', () => {
@@ -314,7 +303,7 @@ describe('Form', () => {
 
       const { queryByText } = createFormComponent({ schema });
 
-      expect(queryByText('Bar')).toBeInTheDOM();
+      expect(queryByText('Bar')).toBeInTheDocument();
     });
 
     it('should handle referenced definitions for array items', () => {
@@ -338,7 +327,7 @@ describe('Form', () => {
         }
       });
 
-      expect(queryByText(/^TestDef/)).toBeInTheDOM();
+      expect(queryByText(/^TestDef/)).toBeInTheDocument();
     });
 
     it('should raise for non-existent definitions referenced', () => {
@@ -364,7 +353,7 @@ describe('Form', () => {
 
       const { getByValue } = createFormComponent({ schema });
 
-      expect(getByValue('hello')).toBeInTheDOM();
+      expect(getByValue('hello')).toBeInTheDocument();
     });
 
     it('should propagate nested referenced definition defaults', () => {
@@ -380,7 +369,7 @@ describe('Form', () => {
 
       const { getByValue } = createFormComponent({ schema });
 
-      expect(getByValue('hello')).toBeInTheDOM();
+      expect(getByValue('hello')).toBeInTheDocument();
     });
 
     it('should propagate referenced definition defaults for array items', () => {
@@ -396,11 +385,11 @@ describe('Form', () => {
 
       const { getByTestId, queryByValue } = createFormComponent({ schema });
 
-      expect(queryByValue('hello')).not.toBeInTheDOM();
+      expect(queryByValue('hello')).not.toBeInTheDocument();
 
       fireEvent.click(getByTestId('add-array-item'));
 
-      expect(queryByValue('hello')).toBeInTheDOM();
+      expect(queryByValue('hello')).toBeInTheDocument();
     });
 
     it('should recursively handle referenced definitions', () => {
@@ -424,11 +413,11 @@ describe('Form', () => {
 
       const { queryById, getByTestId } = createFormComponent({ schema });
 
-      expect(queryById('children.0.name')).not.toBeInTheDOM();
+      expect(queryById('children.0.name')).not.toBeInTheDocument();
 
       fireEvent.click(getByTestId('add-array-item'));
 
-      expect(queryById('children.0.name')).toBeInTheDOM();
+      expect(queryById('children.0.name')).toBeInTheDocument();
     });
 
     it('should priorize definition over schema type property', () => {
@@ -455,7 +444,7 @@ describe('Form', () => {
 
       const { queryByText } = createFormComponent({ schema });
 
-      expect(queryByText('Child Obj')).toBeInTheDOM();
+      expect(queryByText('Child Obj')).toBeInTheDocument();
     });
 
     it('should priorize local properties over definition ones', () => {
@@ -481,7 +470,7 @@ describe('Form', () => {
 
       const { queryByText } = createFormComponent({ schema });
 
-      expect(queryByText('custom title')).toBeInTheDOM();
+      expect(queryByText('custom title')).toBeInTheDocument();
     });
 
     it('should propagate and handle a resolved schema definition', () => {
@@ -647,8 +636,7 @@ describe('Form', () => {
       });
       const input = getByLabelText('Foo');
 
-      input.value = 'new';
-      fireEvent.change(input);
+      fireEvent.change(input, { target: { value: 'new' } });
 
       expect(onChange).toHaveBeenCalledWith(
         expect.objectContaining({ formData: { foo: 'new' } })
@@ -866,15 +854,13 @@ describe('Form', () => {
           submit(form);
 
           // Fix the first field
-          field1.value = 'fixed error';
-          fireEvent.change(field1);
+          fireEvent.change(field1, { target: { value: 'fixed error' } });
           submit(form);
 
           expect(node.querySelectorAll('.field-error')).toHaveLength(1);
 
           // Fix the second field
-          field2.value = 'fixed error too';
-          fireEvent.change(field2);
+          fireEvent.change(field2, { target: { value: 'fixed error too' } });
           submit(form);
 
           // No error remaining, shouldn't throw.
@@ -892,8 +878,7 @@ describe('Form', () => {
           });
           const input = getByLabelText('Foo');
 
-          input.value = 'short';
-          fireEvent.change(input);
+          fireEvent.change(input, { target: { value: 'short' } });
 
           expect(getInstance().state.errorSchema).toEqual({
             __errors: ['should NOT be shorter than 8 characters']
@@ -911,13 +896,12 @@ describe('Form', () => {
           });
           const input = getByLabelText('Foo');
 
-          input.value = 'short';
-          fireEvent.change(input);
+          fireEvent.change(input, { target: { value: 'short' } });
 
           expect(queryAllByTestId('error-detail__item')).toHaveLength(1);
           expect(
             queryByText('should NOT be shorter than 8 characters')
-          ).toBeInTheDOM();
+          ).toBeInTheDocument();
         });
       });
 
@@ -969,8 +953,7 @@ describe('Form', () => {
         });
         const input = getByLabelText('Foo');
 
-        input.value = 'short';
-        fireEvent.change(input);
+        fireEvent.change(input, { target: { value: 'short' } });
 
         fireEvent.submit(node);
 
@@ -987,8 +970,7 @@ describe('Form', () => {
         });
         const input = getByLabelText('Foo');
 
-        input.value = 'short';
-        fireEvent.change(input);
+        fireEvent.change(input, { target: { value: 'short' } });
 
         fireEvent.submit(node);
 
@@ -1007,8 +989,7 @@ describe('Form', () => {
         });
         const input = getByLabelText('Foo');
 
-        input.value = 'short';
-        fireEvent.change(input);
+        fireEvent.change(input, { target: { value: 'short' } });
 
         fireEvent.submit(node);
 
@@ -1019,8 +1000,7 @@ describe('Form', () => {
 
         expect(onError).toHaveBeenCalledTimes(1);
 
-        input.value = 'long enough';
-        fireEvent.change(input);
+        fireEvent.change(input, { target: { value: 'long enough' } });
 
         fireEvent.submit(node);
 
@@ -1057,7 +1037,7 @@ describe('Form', () => {
         expect(queryAllByTestId('error-detail__item')).toHaveLength(1);
         expect(
           queryByText('should NOT be shorter than 8 characters')
-        ).toBeInTheDOM();
+        ).toBeInTheDocument();
       });
     });
 
@@ -1090,8 +1070,8 @@ describe('Form', () => {
         expect(queryAllByTestId('error-detail__item')).toHaveLength(2);
         expect(
           queryByText('should NOT be shorter than 8 characters')
-        ).toBeInTheDOM();
-        expect(queryByText('should match pattern "d+"')).toBeInTheDOM();
+        ).toBeInTheDocument();
+        expect(queryByText('should match pattern "d+"')).toBeInTheDocument();
       });
     });
 
@@ -1138,7 +1118,7 @@ describe('Form', () => {
           within(queryByTitle('level2')).queryByText(
             'should NOT be shorter than 8 characters'
           )
-        ).toBeInTheDOM();
+        ).toBeInTheDocument();
       });
     });
 
@@ -1174,7 +1154,7 @@ describe('Form', () => {
           within(queryById('1')).queryByText(
             'should NOT be shorter than 4 characters'
           )
-        ).toBeInTheDOM();
+        ).toBeInTheDocument();
       });
 
       it('should not denote errors on non impacted fields', () => {
@@ -1232,7 +1212,7 @@ describe('Form', () => {
 
         expect(
           queryByText('should NOT be shorter than 4 characters')
-        ).toBeInTheDOM();
+        ).toBeInTheDocument();
       });
     });
 
@@ -1283,20 +1263,20 @@ describe('Form', () => {
 
         expect(
           within(queryById('outer.0.0')).queryByTestId('error-detail__item')
-        ).not.toBeInTheDOM();
+        ).not.toBeInTheDocument();
         expect(
           within(queryById('outer.0.1')).queryByText(
             'should NOT be shorter than 4 characters'
           )
-        ).toBeInTheDOM();
+        ).toBeInTheDocument();
         expect(
           within(queryById('outer.1.0')).queryByText(
             'should NOT be shorter than 4 characters'
           )
-        ).toBeInTheDOM();
+        ).toBeInTheDocument();
         expect(
           within(queryById('outer.1.1')).queryByTestId('error-detail__item')
-        ).not.toBeInTheDOM();
+        ).not.toBeInTheDocument();
       });
     });
 
@@ -1339,7 +1319,7 @@ describe('Form', () => {
           within(queryById('1.foo')).queryByText(
             'should NOT be shorter than 4 characters'
           )
-        ).toBeInTheDOM();
+        ).toBeInTheDocument();
       });
     });
 
@@ -1387,7 +1367,7 @@ describe('Form', () => {
         }
       };
 
-      it.skip('should only show error for property in selected branch', () => {
+      it('should only show error for property in selected branch', () => {
         const { getInstance, node } = createFormComponent({
           schema,
           liveValidate: true
@@ -1404,7 +1384,7 @@ describe('Form', () => {
         });
       });
 
-      it.skip('should only show errors for properties in selected branch', () => {
+      it('should only show errors for properties in selected branch', () => {
         const { getInstance, node } = createFormComponent({
           schema,
           liveValidate: true,
@@ -1471,8 +1451,7 @@ describe('Form', () => {
         formData: { bar: 'bar' }
       });
 
-      inputBar.value = 'baz';
-      fireEvent.change(inputBar);
+      fireEvent.change(inputBar, { target: { value: 'baz' } });
 
       expect(getInstance().state.formData).toEqual({ bar: 'baz' });
     });
@@ -1496,8 +1475,7 @@ describe('Form', () => {
       });
       const inputBaz = getByLabelText('Baz');
 
-      inputBaz.value = 'baz';
-      fireEvent.change(inputBaz);
+      fireEvent.change(inputBaz, { target: { value: 'baz' } });
 
       expect(getInstance().state.formData).toEqual({ foo: 'foo', baz: 'baz' });
     });

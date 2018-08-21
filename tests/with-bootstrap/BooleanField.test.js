@@ -1,13 +1,10 @@
 import React from 'react';
 import { Simulate } from 'react-dom/test-utils';
-import { cleanup } from 'react-testing-library';
 
 import { createFormComponent } from './test_utils';
 
 describe('BooleanField', () => {
   const CustomWidget = () => <div id="custom" />;
-
-  afterEach(cleanup);
 
   it('should render a boolean field', () => {
     const { node } = createFormComponent({
@@ -29,7 +26,7 @@ describe('BooleanField', () => {
       }
     });
 
-    expect(queryByLabelText('foo')).toBeInTheDOM();
+    expect(queryByLabelText('foo')).toBeInTheDocument();
   });
 
   it('should render a single label', () => {

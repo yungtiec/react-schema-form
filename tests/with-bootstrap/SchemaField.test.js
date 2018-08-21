@@ -1,5 +1,5 @@
 import React from 'react';
-import { fireEvent, within, cleanup } from 'react-testing-library';
+import { fireEvent, within } from 'react-testing-library';
 
 import SchemaField from 'react-jsonschema-form/src/components/fields/SchemaField';
 import TitleTemplate from 'react-jsonschema-form-bootstrap/src/components/templates/TitleTemplate';
@@ -9,8 +9,6 @@ import widgets from 'react-jsonschema-form-bootstrap/src/components/widgets';
 import { createFormComponent, suppressLogs } from './test_utils';
 
 describe('SchemaField', () => {
-  afterEach(cleanup);
-
   describe('Unsupported field', () => {
     it('should warn on invalid field type', () => {
       const { node } = createFormComponent({
@@ -303,7 +301,7 @@ describe('SchemaField', () => {
 
       submit(node);
 
-      expect(queryByText('container')).toBeInTheDOM();
+      expect(queryByText('container')).toBeInTheDocument();
     });
 
     it('should pass errors to child component', () => {
@@ -319,7 +317,7 @@ describe('SchemaField', () => {
       expect(
         within(fooField).queryAllByTestId('error-detail__item')
       ).toHaveLength(1);
-      expect(within(fooField).queryByText('test')).toBeInTheDOM();
+      expect(within(fooField).queryByText('test')).toBeInTheDocument();
     });
 
     describe('Custom error rendering', () => {

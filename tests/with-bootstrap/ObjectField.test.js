@@ -1,11 +1,9 @@
 import React from 'react';
-import { fireEvent, cleanup } from 'react-testing-library';
+import { fireEvent } from 'react-testing-library';
 
 import { createFormComponent } from './test_utils';
 
 describe('ObjectField', () => {
-  afterEach(cleanup);
-
   describe('schema', () => {
     const schema = {
       type: 'object',
@@ -136,8 +134,7 @@ describe('ObjectField', () => {
       const { getInstance, node } = createFormComponent({ schema });
       const input = node.querySelector('input[type=text]');
 
-      input.value = 'changed';
-      fireEvent.change(input);
+      fireEvent.change(input, { target: { value: 'changed' } });
 
       expect(getInstance().state.formData.foo).toEqual('changed');
     });

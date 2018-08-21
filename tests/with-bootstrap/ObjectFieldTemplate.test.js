@@ -1,13 +1,9 @@
 import React, { PureComponent } from 'react';
-import { cleanup } from 'react-testing-library';
 
 import { createFormComponent } from './test_utils';
 
 describe('ObjectFieldTemplate', () => {
   const formData = { foo: 'bar', bar: 'foo' };
-
-  afterEach(cleanup);
-
   class ObjectFieldTemplate extends PureComponent {
     render() {
       const {

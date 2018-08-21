@@ -1,14 +1,11 @@
 import React from 'react';
 import { Simulate } from 'react-dom/test-utils';
-import { cleanup } from 'react-testing-library';
 
 import SelectWidget from 'react-jsonschema-form-bootstrap/src/components/widgets/SelectWidget';
 
 import { createFormComponent } from './test_utils';
 
 describe('uiSchema', () => {
-  afterEach(cleanup);
-
   describe('custom classNames', () => {
     const schema = {
       type: 'object',
@@ -448,7 +445,7 @@ describe('uiSchema', () => {
 
       const { queryByText } = createFormComponent({ schema, uiSchema });
 
-      expect(queryByText('plop')).toBeInTheDOM();
+      expect(queryByText('plop')).toBeInTheDocument();
     });
   });
 
@@ -463,7 +460,7 @@ describe('uiSchema', () => {
 
       const { queryByLabelText } = createFormComponent({ schema, uiSchema });
 
-      expect(queryByLabelText('plop')).toBeInTheDOM();
+      expect(queryByLabelText('plop')).toBeInTheDocument();
     });
   });
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Simulate } from 'react-dom/test-utils';
-import { fireEvent, cleanup } from 'react-testing-library';
+import { fireEvent } from 'react-testing-library';
 
 import { parseDateString, toDateString } from 'react-jsonschema-form/src/utils';
 import { utcToLocal } from 'react-jsonschema-form-bootstrap/src/components/widgets/DateTimeWidget';
@@ -9,8 +9,6 @@ import { createFormComponent } from './test_utils';
 
 describe('StringField', () => {
   const CustomWidget = () => <div id="custom" />;
-
-  afterEach(cleanup);
 
   describe('TextWidget', () => {
     it('should render a string field', () => {
@@ -74,8 +72,7 @@ describe('StringField', () => {
       });
       const input = node.querySelector('input');
 
-      input.value = 'yo';
-      fireEvent.change(input);
+      fireEvent.change(input, { target: { value: 'yo' } });
 
       expect(getInstance().state.formData).toEqual('yo');
     });
@@ -119,8 +116,7 @@ describe('StringField', () => {
       });
       const input = node.querySelector('input');
 
-      input.value = '';
-      fireEvent.change(input);
+      fireEvent.change(input, { target: { value: '' } });
 
       expect(getInstance().state.formData).toEqual(undefined);
     });
@@ -133,8 +129,7 @@ describe('StringField', () => {
       });
       const input = node.querySelector('input');
 
-      input.value = '';
-      fireEvent.change(input);
+      fireEvent.change(input, { target: { value: '' } });
 
       expect(getInstance().state.formData).toEqual('default');
     });
@@ -356,8 +351,7 @@ describe('StringField', () => {
       });
       const textarea = node.querySelector('textarea');
 
-      textarea.value = '';
-      fireEvent.change(textarea);
+      fireEvent.change(textarea, { target: { value: '' } });
 
       expect(getInstance().state.formData).toEqual(undefined);
     });
@@ -373,8 +367,7 @@ describe('StringField', () => {
       });
       const textarea = node.querySelector('textarea');
 
-      textarea.value = '';
-      fireEvent.change(textarea);
+      fireEvent.change(textarea, { target: { value: '' } });
 
       expect(getInstance().state.formData).toEqual('default');
     });
@@ -472,7 +465,7 @@ describe('StringField', () => {
         liveValidate: true
       });
 
-      fireEvent.change(node.querySelector('[type=datetime-local]'), {
+      Simulate.change(node.querySelector('[type=datetime-local]'), {
         target: { value: 'invalid' }
       });
 
@@ -611,7 +604,7 @@ describe('StringField', () => {
         liveValidate: true
       });
 
-      fireEvent.change(node.querySelector('[type=date]'), {
+      Simulate.change(node.querySelector('[type=date]'), {
         target: { value: 'invalid' }
       });
 
@@ -825,7 +818,7 @@ describe('StringField', () => {
 
     describe('Action buttons', () => {
       it('should render action buttons', () => {
-        const { node } = createFormComponent({
+        const { queryAllByText } = createFormComponent({
           schema: {
             type: 'string',
             format: 'date-time'
@@ -833,15 +826,12 @@ describe('StringField', () => {
           uiSchema
         });
 
-        const buttonLabels = [].map.call(
-          node.querySelectorAll('a.btn'),
-          x => x.textContent
-        );
-        expect(buttonLabels).toEqual(['Now', 'Clear']);
+        expect(queryAllByText('Now')).toHaveLength(1);
+        expect(queryAllByText('Clear')).toHaveLength(1);
       });
 
       it('should set current date when pressing the Now button', () => {
-        const { getInstance, node } = createFormComponent({
+        const { getInstance, getByText } = createFormComponent({
           schema: {
             type: 'string',
             format: 'date-time'
@@ -849,7 +839,7 @@ describe('StringField', () => {
           uiSchema
         });
 
-        fireEvent.click(node.querySelector('a.btn-now'));
+        fireEvent.click(getByText('Now'));
 
         // Test that the two DATETIMEs are within 5 seconds of each other.
         const now = new Date().getTime();
@@ -858,7 +848,7 @@ describe('StringField', () => {
       });
 
       it('should clear current date when pressing the Clear button', () => {
-        const { getInstance, node } = createFormComponent({
+        const { getInstance, getByText } = createFormComponent({
           schema: {
             type: 'string',
             format: 'date-time'
@@ -866,8 +856,8 @@ describe('StringField', () => {
           uiSchema
         });
 
-        fireEvent.click(node.querySelector('a.btn-now'));
-        fireEvent.click(node.querySelector('a.btn-clear'));
+        fireEvent.click(getByText('Now'));
+        fireEvent.click(getByText('Clear'));
 
         expect(getInstance().state.formData).toEqual(undefined);
       });
@@ -1083,7 +1073,7 @@ describe('StringField', () => {
 
     describe('Action buttons', () => {
       it('should render action buttons', () => {
-        const { node } = createFormComponent({
+        const { queryAllByText } = createFormComponent({
           schema: {
             type: 'string',
             format: 'date'
@@ -1091,15 +1081,12 @@ describe('StringField', () => {
           uiSchema
         });
 
-        const buttonLabels = [].map.call(
-          node.querySelectorAll('a.btn'),
-          x => x.textContent
-        );
-        expect(buttonLabels).toEqual(['Now', 'Clear']);
+        expect(queryAllByText('Now')).toHaveLength(1);
+        expect(queryAllByText('Clear')).toHaveLength(1);
       });
 
       it('should set current date when pressing the Now button', () => {
-        const { getInstance, node } = createFormComponent({
+        const { getInstance, getByText } = createFormComponent({
           schema: {
             type: 'string',
             format: 'date'
@@ -1107,7 +1094,7 @@ describe('StringField', () => {
           uiSchema
         });
 
-        fireEvent.click(node.querySelector('a.btn-now'));
+        fireEvent.click(getByText('Now'));
 
         const expected = toDateString(
           parseDateString(new Date().toJSON()),
@@ -1117,7 +1104,7 @@ describe('StringField', () => {
       });
 
       it('should clear current date when pressing the Clear button', () => {
-        const { getInstance, node } = createFormComponent({
+        const { getInstance, getByText } = createFormComponent({
           schema: {
             type: 'string',
             format: 'date'
@@ -1125,8 +1112,8 @@ describe('StringField', () => {
           uiSchema
         });
 
-        fireEvent.click(node.querySelector('a.btn-now'));
-        fireEvent.click(node.querySelector('a.btn-clear'));
+        fireEvent.click(getByText('Now'));
+        fireEvent.click(getByText('Clear'));
 
         expect(getInstance().state.formData).toEqual(undefined);
       });

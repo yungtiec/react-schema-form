@@ -1,12 +1,9 @@
 import React, { PureComponent } from 'react';
-import { cleanup } from 'react-testing-library';
 
 import { createFormComponent } from './test_utils';
 
 describe('ArrayFieldTemplate', () => {
   const formData = ['one', 'two', 'three'];
-
-  afterEach(cleanup);
 
   describe('Custom ArrayFieldTemplate of string array', () => {
     function ArrayFieldTemplate(props) {

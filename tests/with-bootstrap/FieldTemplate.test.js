@@ -1,11 +1,8 @@
 import React from 'react';
-import { cleanup } from 'react-testing-library';
 
 import { createFormComponent } from './test_utils';
 
 describe('FieldTemplate', () => {
-  afterEach(cleanup);
-
   describe('Custom FieldTemplate for disabled property', () => {
     function FieldTemplate(props) {
       return <div className={props.disabled ? 'disabled' : 'foo'} />;

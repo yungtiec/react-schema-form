@@ -1,12 +1,9 @@
 import React from 'react';
 import { Simulate } from 'react-dom/test-utils';
-import { cleanup } from 'react-testing-library';
 
 import { createFormComponent } from './test_utils';
 
 describe('NumberField', () => {
-  afterEach(cleanup);
-
   describe('TextWidget', () => {
     it('should render a string field', () => {
       const { node } = createFormComponent({

@@ -1,15 +1,15 @@
 /*eslint no-console: off*/
 import React, { Component } from 'react';
 import { render } from 'react-dom';
-import { UnControlled as CodeMirror } from 'react-codemirror2';
+// import { UnControlled as CodeMirror } from 'react-codemirror2';
 import 'codemirror/mode/javascript/javascript';
 
 import { shouldRender } from '@react-schema-form/core/src/utils';
 import Form from '@react-schema-form/bootstrap';
 
 import { samples } from './samples';
-import CheckMark from './components/icons/Checkmark';
-import Cross from './components/icons/Cross';
+// import CheckMark from './components/icons/Checkmark';
+// import Cross from './components/icons/Cross';
 
 // Import a few CodeMirror themes; these are used to match alternative
 // bootstrap ones.
@@ -23,23 +23,23 @@ import 'codemirror/theme/monokai.css';
 import 'codemirror/theme/eclipse.css';
 
 const log = type => console.log.bind(console, type);
-const fromJson = json => JSON.parse(json);
-const toJson = val => JSON.stringify(val, null, 2);
+// const fromJson = json => JSON.parse(json);
+// const toJson = val => JSON.stringify(val, null, 2);
 const liveValidateSchema = { type: 'boolean', title: 'Live validation' };
-const cmOptions = {
-  theme: 'default',
-  height: 'auto',
-  viewportMargin: Infinity,
-  mode: {
-    name: 'javascript',
-    json: true,
-    statementIndent: 2
-  },
-  lineNumbers: true,
-  lineWrapping: true,
-  indentWithTabs: false,
-  tabSize: 2
-};
+// const cmOptions = {
+//   theme: 'default',
+//   height: 'auto',
+//   viewportMargin: Infinity,
+//   mode: {
+//     name: 'javascript',
+//     json: true,
+//     statementIndent: 2
+//   },
+//   lineNumbers: true,
+//   lineWrapping: true,
+//   indentWithTabs: false,
+//   tabSize: 2
+// };
 const themes = {
   default: {
     stylesheet:
@@ -165,49 +165,49 @@ class GeoPosition extends Component {
   }
 }
 
-class Editor extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { valid: true, code: props.code };
-  }
+// class Editor extends Component {
+//   constructor(props) {
+//     super(props);
+//     this.state = { valid: true, code: props.code };
+//   }
 
-  componentWillReceiveProps(props) {
-    this.setState({ valid: true, code: props.code });
-  }
+//   componentWillReceiveProps(props) {
+//     this.setState({ valid: true, code: props.code });
+//   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    return shouldRender(this, nextProps, nextState);
-  }
+//   shouldComponentUpdate(nextProps, nextState) {
+//     return shouldRender(this, nextProps, nextState);
+//   }
 
-  onCodeChange = (editor, metadata, code) => {
-    this.setState({ valid: true, code });
-    setImmediate(() => {
-      try {
-        this.props.onChange(fromJson(this.state.code));
-      } catch (err) {
-        this.setState({ valid: false, code });
-      }
-    });
-  };
+//   onCodeChange = (editor, metadata, code) => {
+//     this.setState({ valid: true, code });
+//     setImmediate(() => {
+//       try {
+//         this.props.onChange(fromJson(this.state.code));
+//       } catch (err) {
+//         this.setState({ valid: false, code });
+//       }
+//     });
+//   };
 
-  render() {
-    const { title, theme } = this.props;
-    return (
-      <div className="card mb-4">
-        <div className="card-header">
-          {this.state.valid ? <CheckMark /> : <Cross />}
-          {' ' + title}
-        </div>
-        <CodeMirror
-          value={this.state.code}
-          onChange={this.onCodeChange}
-          autoCursor={false}
-          options={Object.assign({}, cmOptions, { theme })}
-        />
-      </div>
-    );
-  }
-}
+//   render() {
+//     const { title, theme } = this.props;
+//     return (
+//       <div className="card mb-4">
+//         <div className="card-header">
+//           {this.state.valid ? <CheckMark /> : <Cross />}
+//           {' ' + title}
+//         </div>
+//         <CodeMirror
+//           value={this.state.code}
+//           onChange={this.onCodeChange}
+//           autoCursor={false}
+//           options={Object.assign({}, cmOptions, { theme })}
+//         />
+//       </div>
+//     );
+//   }
+// }
 
 class Selector extends Component {
   constructor(props) {
@@ -389,7 +389,7 @@ class App extends Component {
       liveValidate,
       validate,
       theme,
-      editor,
+      // editor,
       templates,
       transformErrors
     } = this.state;
@@ -419,7 +419,7 @@ class App extends Component {
         </div>
         <div className="row">
           <div className="col-md-7">
-            <Editor
+            {/* <Editor
               title="JSONSchema"
               theme={editor}
               code={toJson(schema)}
@@ -442,7 +442,7 @@ class App extends Component {
                   onChange={this.onFormDataEdited}
                 />
               </div>
-            </div>
+            </div> */}
           </div>
           <div className="col-md-5 mb-3">
             {this.state.form && (

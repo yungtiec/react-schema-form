@@ -5,7 +5,7 @@ The core of the library is **UI agnostic** so you can use one of the [already bu
 
 It's based on the great library [react-jsonschema-form](https://github.com/mozilla-services/react-jsonschema-form) (rjsf). The main difference is in the modularization of this library so you can use custom UI components (UI agnostic). Currently there is only one offical theme package with Bootstrap 4 (`@react-schema-form/bootstrap`).
 
-If you want to replace rjsf with this library then you just need change imports of `Form` in your code:
+If you want to replace rjsf with this library then you just need to change imports of `Form` in your code:
 
 ```diff
 - import Form from 'react-jsonschema-form';

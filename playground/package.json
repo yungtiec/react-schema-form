@@ -4,7 +4,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "start": "parcel src/index.html --no-cache",
+    "start": "parcel src/index.html",
     "build": "rimraf dist && parcel build src/index.html --public-url /react-jsonschema-form/",
     "gh-pages": "npm run build && gh-pages --dist dist/",
     "icons": "svgr --out-dir src/components/icons svg --icon"

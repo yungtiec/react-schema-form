@@ -395,7 +395,7 @@ class App extends Component {
     } = this.state;
 
     return (
-      <div className="container-fluid">
+      <div className="container">
         <div className="pb-2 mt-2 mb-3 border-bottom">
           <h1>React Schema Form</h1>
           <div className="row">
@@ -417,9 +417,10 @@ class App extends Component {
             </div>
           </div>
         </div>
-        <div className="row">
-          <div className="col-md-7">
-            {/* <Editor
+        <div>
+          {/* <div className="row"> */}
+          {/* <div className="col-md-7">
+            <Editor
               title="JSONSchema"
               theme={editor}
               code={toJson(schema)}
@@ -442,47 +443,47 @@ class App extends Component {
                   onChange={this.onFormDataEdited}
                 />
               </div>
-            </div> */}
+            </div>
           </div>
-          <div className="col-md-5 mb-3">
-            {this.state.form && (
-              <Form
-                liveValidate={liveValidate}
-                schema={schema}
-                uiSchema={uiSchema}
-                formData={formData}
-                onChange={this.onFormDataChange}
-                onSubmit={({ formData }) =>
-                  console.log('submitted formData', formData)
-                }
-                fields={{ geo: GeoPosition }}
-                templates={templates}
-                validate={validate}
-                onBlur={(id, value) =>
-                  console.log(`Touched ${id} with value ${value}`)
-                }
-                onFocus={(id, value) =>
-                  console.log(`Focused ${id} with value ${value}`)
-                }
-                transformErrors={transformErrors}
-                onError={log('errors')}
-              >
-                <div className="row">
-                  <div className="col-sm-3">
-                    <button className="btn btn-primary" type="submit">
-                      Submit
-                    </button>
-                  </div>
-                  <div className="col-sm-9 text-right">
-                    <CopyLink
-                      shareURL={this.state.shareURL}
-                      onShare={this.onShare}
-                    />
-                  </div>
+          <div className="col-md-5 mb-3"> */}
+          {this.state.form && (
+            <Form
+              liveValidate={liveValidate}
+              schema={schema}
+              uiSchema={uiSchema}
+              formData={formData}
+              onChange={this.onFormDataChange}
+              onSubmit={({ formData }) =>
+                console.log('submitted formData', formData)
+              }
+              fields={{ geo: GeoPosition }}
+              templates={templates}
+              validate={validate}
+              onBlur={(id, value) =>
+                console.log(`Touched ${id} with value ${value}`)
+              }
+              onFocus={(id, value) =>
+                console.log(`Focused ${id} with value ${value}`)
+              }
+              transformErrors={transformErrors}
+              onError={log('errors')}
+            >
+              <div className="row">
+                <div className="col-sm-3">
+                  <button className="btn btn-primary" type="submit">
+                    Submit
+                  </button>
                 </div>
-              </Form>
-            )}
-          </div>
+                <div className="col-sm-9 text-right">
+                  <CopyLink
+                    shareURL={this.state.shareURL}
+                    onShare={this.onShare}
+                  />
+                </div>
+              </div>
+            </Form>
+          )}
+          {/* </div> */}
         </div>
       </div>
     );

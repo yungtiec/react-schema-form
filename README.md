@@ -1752,16 +1752,10 @@ This component follows [JSON Schema](http://json-schema.org/documentation.html) 
 
 ### Coding style
 
-All the JavaScript code in this project conforms to the [prettier](https://github.com/prettier/prettier) coding style. A command is provided to ensure your code is always formatted accordingly:
+All the JavaScript code in this project conforms to the [Prettier](https://github.com/prettier/prettier) coding style which uses ESLint config `.eslintrc.js`. An optional command is provided to ensure your code is always formatted accordingly (but it's not necessary because it's done automatically before every commit):
 
 ```
-$ npm run cs-format
-```
-
-The `cs-check` command ensures all files conform to that style:
-
-```
-$ npm run cs-check
+$ npm run format
 ```
 
 ### Development server
@@ -1770,13 +1764,7 @@ $ npm run cs-check
 $ npm start
 ```
 
-A live development server showcasing components with hot reload enabled is available at [localhost:8080](http://localhost:8080).
-
-If you want the development server to listen on another host or port, you can use the RJSF_DEV_SERVER env variable:
-
-```
-$ RJSF_DEV_SERVER=0.0.0.0:8000 npm start
-```
+A live development server showcasing components is available at [localhost:1234](http://localhost:1234) (if you already use this port then it will automatically uses different - you can see it in the console log).
 
 ### Tests
 

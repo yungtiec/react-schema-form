@@ -1,9 +1,11 @@
-# react-schema-form
+# React Schema Form
 
 A simple [React](http://facebook.github.io/react/) library capable of building HTML forms out of a [JSON schema](http://json-schema.org/).
 The core of the library is **UI agnostic** so you can use one of the [already built themes](/packages) or you can build your own!
 
-A [live playground](https://mozilla-services.github.io/react-schema-form/) is hosted on gh-pages.
+It's based on the great library [react-jsonschema-form](https://github.com/mozilla-services/react-jsonschema-form) (rjsf). The main difference is in the modularization of this library so you can use custom UI components (UI agnostic)! 
+
+A [live playground](https://MatejMazur.github.io/react-schema-form/) is hosted on gh-pages.
 
 ![](http://i.imgur.com/M8ZCES5.gif)
 
@@ -107,7 +109,7 @@ A [live playground](https://mozilla-services.github.io/react-schema-form/) is ho
 
 ## Philosophy
 
-react-schema-form is meant to automatically generate a React form based on a [JSON Schema](http://json-schema.org/). If you want to generate a form for any data, sight unseen, simply given a JSON schema, react-schema-form may be for you. If you have _a priori_ knowledge of your data and want a toolkit for generating forms for it, you might look elsewhere.
+React Schema Form is meant to automatically generate a React form based on a [JSON Schema](http://json-schema.org/). If you want to generate a form for any data, sight unseen, simply given a JSON schema, react-schema-form may be for you. If you have _a priori_ knowledge of your data and want a toolkit for generating forms for it, you might look elsewhere.
 
 react-schema-form validates that the data conforms to the given schema, but doesn't prevent the user from inputing data that doesn't fit (for example, stripping non-numbers from a number field, or adding values to an array that is already "full").
 
@@ -115,7 +117,7 @@ react-schema-form validates that the data conforms to the given schema, but does
 
 > Note: The `master` branch of the repository reflects ongoing development. Releases are published as [tags](https://github.com/mozilla-services/react-schema-form/releases). You should never blindly install from `master`, but rather check what the available stable releases are.
 
-### As a npm-based project dependency (themed)
+### As a npm-based project dependency
 
 It depends on what theme do you want to use. So for example installation of React Schema Form with Bootstrap looks like this:
 

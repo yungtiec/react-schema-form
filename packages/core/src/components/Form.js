@@ -10,7 +10,7 @@ import {
 } from '../utils';
 import validateFormData, { toErrorList } from '../validate';
 
-export default class FormContainer extends Component {
+export default class Form extends Component {
   static defaultProps = {
     uiSchema: {},
     noValidate: false,
@@ -226,7 +226,7 @@ export default class FormContainer extends Component {
 }
 
 if (process.env.NODE_ENV !== 'production') {
-  FormContainer.propTypes = {
+  Form.propTypes = {
     schema: PropTypes.object.isRequired,
     uiSchema: PropTypes.object,
     formData: PropTypes.any,

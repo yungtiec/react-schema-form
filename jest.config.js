@@ -1,6 +1,6 @@
 module.exports = {
-  setupTestFrameworkScriptFile: '<rootDir>/tests/setup-test-env.js',
+  setupTestFrameworkScriptFile: '<rootDir>/shared/setup-test-env.js',
   moduleNameMapper: {
-    '.*(css|less|scss|jpg|jpeg|gif|png)$': '<rootDir>/tests/mock-assets.js'
+    '.*(css|less|scss|jpg|jpeg|gif|png)$': '<rootDir>/shared/mock-assets.js'
   }
 };

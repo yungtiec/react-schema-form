@@ -1,13 +1,10 @@
 import React from 'react';
 import { render, fireEvent, wait, within } from 'react-testing-library';
 
-import BaseForm from 'react-jsonschema-form/src';
-import theme from 'react-jsonschema-form-bootstrap/src';
+import Form from '@react-schema-form/bootstrap/src';
 import { createFormComponent, suppressLogs } from './test_utils';
 
 describe('Form', () => {
-  const Form = props => <BaseForm theme={theme} {...props} />;
-
   describe('Empty schema', () => {
     it('should render a form tag', () => {
       const { node } = createFormComponent({ schema: {} });

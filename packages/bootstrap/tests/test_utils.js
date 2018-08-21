@@ -4,9 +4,8 @@ import React from 'react';
 import { render } from 'react-testing-library';
 import 'jest-dom/extend-expect';
 
-import Form from 'react-jsonschema-form/src';
-import FormContainer from 'react-jsonschema-form/src/components/FormContainer';
-import theme from 'react-jsonschema-form-bootstrap/src';
+import { Form } from '@react-schema-form/core/src';
+import ThemedForm from '@react-schema-form/bootstrap/src';
 
 export function createComponent(Component, props, spy) {
   const idPrefix = props.idPrefix || 'root';
@@ -46,10 +45,10 @@ export function createComponent(Component, props, spy) {
 }
 
 export function createFormComponent(props) {
-  const spy = jest.spyOn(FormContainer.prototype, 'render');
+  const spy = jest.spyOn(Form.prototype, 'render');
   return createComponent(
-    Form,
-    { theme, ...props, safeRenderCompletion: true },
+    ThemedForm,
+    { ...props, safeRenderCompletion: true },
     spy
   );
 }

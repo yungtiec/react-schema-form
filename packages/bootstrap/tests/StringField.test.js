@@ -2,8 +2,11 @@ import React from 'react';
 import { Simulate } from 'react-dom/test-utils';
 import { fireEvent } from 'react-testing-library';
 
-import { parseDateString, toDateString } from 'react-jsonschema-form/src/utils';
-import { utcToLocal } from 'react-jsonschema-form-bootstrap/src/components/widgets/DateTimeWidget';
+import {
+  parseDateString,
+  toDateString
+} from '@react-schema-form/core/src/utils';
+import { utcToLocal } from '@react-schema-form/bootstrap/src/components/widgets/DateTimeWidget';
 
 import { createFormComponent } from './test_utils';
 

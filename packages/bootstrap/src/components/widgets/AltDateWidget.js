@@ -6,7 +6,7 @@ import {
   parseDateString,
   toDateString,
   pad
-} from 'react-jsonschema-form/src/utils';
+} from '@react-schema-form/core/src/utils';
 
 function rangeOptions(start, stop) {
   let options = [];

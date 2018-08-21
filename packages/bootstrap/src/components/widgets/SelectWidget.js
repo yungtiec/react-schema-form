@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { asNumber } from 'react-jsonschema-form/src/utils';
+import { asNumber } from '@react-schema-form/core/src/utils';
 
 /**
  * This is a silly limitation in the DOM where option change event values are

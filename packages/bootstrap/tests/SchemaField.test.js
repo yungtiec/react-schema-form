@@ -1,10 +1,10 @@
 import React from 'react';
 import { fireEvent, within } from 'react-testing-library';
 
-import SchemaField from 'react-jsonschema-form/src/components/fields/SchemaField';
-import TitleTemplate from 'react-jsonschema-form-bootstrap/src/components/templates/TitleTemplate';
-import DescriptionTemplate from 'react-jsonschema-form-bootstrap/src/components/templates/DescriptionTemplate';
-import widgets from 'react-jsonschema-form-bootstrap/src/components/widgets';
+import SchemaField from '@react-schema-form/core/src/components/fields/SchemaField';
+import TitleTemplate from '@react-schema-form/bootstrap/src/components/templates/TitleTemplate';
+import DescriptionTemplate from '@react-schema-form/bootstrap/src/components/templates/DescriptionTemplate';
+import { widgets } from '@react-schema-form/bootstrap/src';
 
 import { createFormComponent, suppressLogs } from './test_utils';
 

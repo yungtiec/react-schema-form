@@ -4,9 +4,8 @@ import { render } from 'react-dom';
 import { UnControlled as CodeMirror } from 'react-codemirror2';
 import 'codemirror/mode/javascript/javascript';
 
-import { shouldRender } from 'react-jsonschema-form/src/utils';
-import BaseForm from 'react-jsonschema-form';
-import theme from 'react-jsonschema-form-bootstrap';
+import { shouldRender } from '@react-schema-form/core/src/utils';
+import Form from '@react-schema-form/bootstrap';
 
 import { samples } from './samples';
 import CheckMark from './components/icons/Checkmark';
@@ -23,7 +22,6 @@ import 'codemirror/theme/solarized.css';
 import 'codemirror/theme/monokai.css';
 import 'codemirror/theme/eclipse.css';
 
-const Form = props => <BaseForm theme={theme} {...props} />;
 const log = type => console.log.bind(console, type);
 const fromJson = json => JSON.parse(json);
 const toJson = val => JSON.stringify(val, null, 2);
@@ -413,7 +411,7 @@ class App extends Component {
     return (
       <div className="container-fluid">
         <div className="pb-2 mt-2 mb-3 border-bottom">
-          <h1>react-jsonschema-form</h1>
+          <h1>React Schema Form</h1>
           <div className="row">
             <div className="col-sm-8">
               <Selector onSelected={this.load} />

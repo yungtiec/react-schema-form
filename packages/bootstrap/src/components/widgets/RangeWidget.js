@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { rangeSpec } from 'react-jsonschema-form/src/utils';
+import { rangeSpec } from '@react-schema-form/core/src/utils';
 
 function RangeWidget(props) {
   const {

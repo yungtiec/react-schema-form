@@ -1,8 +1,8 @@
 import { scryRenderedComponentsWithType } from 'react-dom/test-utils';
 
-import fields from 'react-jsonschema-form/src/components/fields';
-import theme from 'react-jsonschema-form-bootstrap/src';
-import SchemaField from 'react-jsonschema-form/src/components/fields/SchemaField';
+import fields from '@react-schema-form/core/src/components/fields';
+import * as theme from '@react-schema-form/bootstrap/src';
+import SchemaField from '@react-schema-form/core/src/components/fields/SchemaField';
 
 import { createComponent, createFormComponent } from './test_utils';
 

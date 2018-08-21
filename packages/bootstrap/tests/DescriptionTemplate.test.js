@@ -1,6 +1,6 @@
 import React from 'react';
 
-import DescriptionTemplate from 'react-jsonschema-form-bootstrap/src/components/templates/DescriptionTemplate';
+import DescriptionTemplate from '@react-schema-form/bootstrap/src/components/templates/DescriptionTemplate';
 
 import { createComponent } from './test_utils';
 

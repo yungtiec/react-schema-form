@@ -5,7 +5,7 @@ import {
   dataURItoBlob,
   shouldRender,
   setState
-} from 'react-jsonschema-form/src/utils';
+} from '@react-schema-form/core/src/utils';
 
 function addNameToDataURL(dataURL, name) {
   return dataURL.replace(';base64', `;name=${name};base64`);

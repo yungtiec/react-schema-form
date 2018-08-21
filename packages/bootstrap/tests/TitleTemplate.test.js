@@ -1,6 +1,6 @@
 import React from 'react';
 
-import TitleTemplate from 'react-jsonschema-form-bootstrap/src/components/templates/TitleTemplate';
+import TitleTemplate from '@react-schema-form/bootstrap/src/components/templates/TitleTemplate';
 
 import { createComponent } from './test_utils';
 

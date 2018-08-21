@@ -3,7 +3,7 @@ import { Simulate } from 'react-dom/test-utils';
 
 import validateFormData, {
   toErrorList
-} from 'react-jsonschema-form/src/validate';
+} from '@react-schema-form/core/src/validate';
 import { createFormComponent } from './test_utils';
 
 describe('Validation', () => {

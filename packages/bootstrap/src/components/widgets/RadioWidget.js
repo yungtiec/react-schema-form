@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 
 function RadioWidget(props) {
@@ -20,13 +20,18 @@ function RadioWidget(props) {
     <div className="field-radio-group form-group">
       {enumOptions.map((option, i) => {
         const checked = option.value === value;
-        const disabledCls = disabled || readonly ? 'disabled' : '';
-        const radio = (
-          <Fragment>
+        return (
+          <div
+            key={i}
+            className={'form-check' + inline ? ' form-check-inline' : ''}
+          >
+            <label htmlFor={name} className="form-check-label" />
             <input
               type="radio"
+              className="form-check-input"
               checked={checked}
               name={name}
+              id={name}
               required={required}
               value={option.value}
               disabled={disabled || readonly}
@@ -34,16 +39,6 @@ function RadioWidget(props) {
               onChange={() => onChange(option.value)}
             />
             {option.label}
-          </Fragment>
-        );
-
-        return inline ? (
-          <label key={i} className={`radio-inline ${disabledCls}`}>
-            {radio}
-          </label>
-        ) : (
-          <div key={i} className={`radio ${disabledCls}`}>
-            <label>{radio}</label>
           </div>
         );
       })}

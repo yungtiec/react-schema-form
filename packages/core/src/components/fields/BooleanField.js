@@ -61,6 +61,7 @@ if (process.env.NODE_ENV !== 'production') {
         PropTypes.oneOfType([PropTypes.func, PropTypes.object])
       ).isRequired,
       fields: PropTypes.objectOf(PropTypes.func).isRequired,
+      definitions: PropTypes.object.isRequired,
       formContext: PropTypes.object.isRequired
     }),
     rawErrors: PropTypes.arrayOf(PropTypes.string)

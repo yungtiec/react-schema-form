@@ -392,6 +392,39 @@ describe('ArrayField', () => {
       expect(inputs[3].id).toEqual('root_foo_1_baz');
     });
 
+    it('should render enough inputs with proper defaults to match minItems in schema when no formData is set', () => {
+      const complexSchema = {
+        type: 'object',
+        definitions: {
+          Thing: {
+            type: 'object',
+            properties: {
+              name: {
+                type: 'string',
+                default: 'Default name'
+              }
+            }
+          }
+        },
+        properties: {
+          foo: {
+            type: 'array',
+            minItems: 2,
+            items: {
+              $ref: '#/definitions/Thing'
+            }
+          }
+        }
+      };
+      let form = createFormComponent({
+        schema: complexSchema,
+        formData: {}
+      });
+      let inputs = form.node.querySelectorAll('input[type=text]');
+      expect(inputs[0].value).toEqual('Default name');
+      expect(inputs[1].value).toEqual('Default name');
+    });
+
     it('should render an input for each default value, even when this is greater than minItems', () => {
       const schema = {
         type: 'object',
@@ -494,6 +527,38 @@ describe('ArrayField', () => {
       expect(form.state.errors.length).toBe(1);
       expect(form.state.errors[0].name).toBe('minItems');
       expect(form.state.errors[0].params.limit).toBe(3);
+    });
+
+    it('should honor given formData, even when it does not meet ths minItems-requirement', () => {
+      const complexSchema = {
+        type: 'object',
+        definitions: {
+          Thing: {
+            type: 'object',
+            properties: {
+              name: {
+                type: 'string',
+                default: 'Default name'
+              }
+            }
+          }
+        },
+        properties: {
+          foo: {
+            type: 'array',
+            minItems: 2,
+            items: {
+              $ref: '#/definitions/Thing'
+            }
+          }
+        }
+      };
+      const form = createFormComponent({
+        schema: complexSchema,
+        formData: { foo: [] }
+      });
+      const inputs = form.node.querySelectorAll('input[type=text]');
+      expect(inputs.length).toEqual(0);
     });
   });
 

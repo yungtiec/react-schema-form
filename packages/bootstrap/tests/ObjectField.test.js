@@ -249,6 +249,65 @@ describe('ObjectField', () => {
       );
     });
 
+    it('should order referenced schema definitions', () => {
+      const refSchema = {
+        definitions: {
+          testdef: { type: 'string' }
+        },
+        type: 'object',
+        properties: {
+          foo: { $ref: '#/definitions/testdef' },
+          bar: { $ref: '#/definitions/testdef' }
+        }
+      };
+
+      const { node } = createFormComponent({
+        schema: refSchema,
+        uiSchema: {
+          'ui:order': ['bar', 'foo']
+        }
+      });
+      const labels = [].map.call(
+        node.querySelectorAll('.field > label'),
+        l => l.textContent
+      );
+
+      expect(labels).toEqual(['bar', 'foo']);
+    });
+
+    it('should order referenced object schema definition properties', () => {
+      const refSchema = {
+        definitions: {
+          testdef: {
+            type: 'object',
+            properties: {
+              foo: { type: 'string' },
+              bar: { type: 'string' }
+            }
+          }
+        },
+        type: 'object',
+        properties: {
+          root: { $ref: '#/definitions/testdef' }
+        }
+      };
+
+      const { node } = createFormComponent({
+        schema: refSchema,
+        uiSchema: {
+          root: {
+            'ui:order': ['bar', 'foo']
+          }
+        }
+      });
+      const labels = [].map.call(
+        node.querySelectorAll('.field > label'),
+        l => l.textContent
+      );
+
+      expect(labels).toEqual(['bar', 'foo']);
+    });
+
     it('should render the widget with the expected id', () => {
       const schema = {
         type: 'object',

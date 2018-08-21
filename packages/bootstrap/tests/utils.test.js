@@ -10,6 +10,7 @@ import {
   mergeObjects,
   pad,
   parseDateString,
+  retrieveSchema,
   shouldRender,
   toDateString,
   toIdSchema
@@ -234,6 +235,27 @@ describe('utils', () => {
           array: ['foo', undefined]
         });
       });
+
+      it('should use schema default for referenced definitions', () => {
+        const schema = {
+          definitions: {
+            testdef: {
+              type: 'object',
+              properties: {
+                foo: { type: 'number' }
+              }
+            }
+          },
+          $ref: '#/definitions/testdef',
+          default: { foo: 42 }
+        };
+
+        expect(
+          getDefaultFormState(schema, undefined, schema.definitions)
+        ).toEqual({
+          foo: 42
+        });
+      });
     });
   });
 
@@ -349,6 +371,17 @@ describe('utils', () => {
           expect(isMultiSelect(schema)).toBe(true);
         });
       });
+
+      it('should retrieve reference schema definitions', () => {
+        const schema = {
+          items: { $ref: '#/definitions/FooItem' },
+          uniqueItems: true
+        };
+        const definitions = {
+          FooItem: { type: 'string', enum: ['foo'] }
+        };
+        expect(isMultiSelect(schema, definitions)).toBe(true);
+      });
     });
 
     it('should be false if uniqueItems is false', () => {
@@ -442,6 +475,373 @@ describe('utils', () => {
 
         expect(mergeObjects(obj1, obj2, true)).toEqual({
           a: { b: [1, 2] }
+        });
+      });
+    });
+  });
+
+  describe('retrieveSchema()', () => {
+    it('should \'resolve\' a schema which contains definitions', () => {
+      const schema = { $ref: '#/definitions/address' };
+      const address = {
+        type: 'object',
+        properties: {
+          street_address: { type: 'string' },
+          city: { type: 'string' },
+          state: { type: 'string' }
+        },
+        required: ['street_address', 'city', 'state']
+      };
+      const definitions = { address };
+
+      expect(retrieveSchema(schema, definitions)).toEqual(address);
+    });
+
+    it('should \'resolve\' escaped JSON Pointers', () => {
+      const schema = { $ref: '#/definitions/a~0complex~1name' };
+      const address = { type: 'string' };
+      const definitions = { 'a~complex/name': address };
+
+      expect(retrieveSchema(schema, definitions)).toEqual(address);
+    });
+
+    it('should priorize local definitions over foreign ones', () => {
+      const schema = {
+        $ref: '#/definitions/address',
+        title: 'foo'
+      };
+      const address = {
+        type: 'string',
+        title: 'bar'
+      };
+      const definitions = { address };
+
+      expect(retrieveSchema(schema, definitions)).toEqual({
+        ...address,
+        title: 'foo'
+      });
+    });
+
+    describe('property dependencies', () => {
+      describe('false condition', () => {
+        it('should not add required properties', () => {
+          const schema = {
+            type: 'object',
+            properties: {
+              a: { type: 'string' },
+              b: { type: 'integer' }
+            },
+            required: ['a'],
+            dependencies: {
+              a: ['b']
+            }
+          };
+          const definitions = {};
+          const formData = {};
+          expect(retrieveSchema(schema, definitions, formData)).toEqual({
+            type: 'object',
+            properties: {
+              a: { type: 'string' },
+              b: { type: 'integer' }
+            },
+            required: ['a']
+          });
+        });
+      });
+
+      describe('true condition', () => {
+        describe('when required is not defined', () => {
+          it('should define required properties', () => {
+            const schema = {
+              type: 'object',
+              properties: {
+                a: { type: 'string' },
+                b: { type: 'integer' }
+              },
+              dependencies: {
+                a: ['b']
+              }
+            };
+            const definitions = {};
+            const formData = { a: '1' };
+            expect(retrieveSchema(schema, definitions, formData)).toEqual({
+              type: 'object',
+              properties: {
+                a: { type: 'string' },
+                b: { type: 'integer' }
+              },
+              required: ['b']
+            });
+          });
+        });
+
+        describe('when required is defined', () => {
+          it('should concat required properties', () => {
+            const schema = {
+              type: 'object',
+              properties: {
+                a: { type: 'string' },
+                b: { type: 'integer' }
+              },
+              required: ['a'],
+              dependencies: {
+                a: ['b']
+              }
+            };
+            const definitions = {};
+            const formData = { a: '1' };
+            expect(retrieveSchema(schema, definitions, formData)).toEqual({
+              type: 'object',
+              properties: {
+                a: { type: 'string' },
+                b: { type: 'integer' }
+              },
+              required: ['a', 'b']
+            });
+          });
+        });
+      });
+    });
+
+    describe('schema dependencies', () => {
+      describe('conditional', () => {
+        describe('false condition', () => {
+          it('should not modify properties', () => {
+            const schema = {
+              type: 'object',
+              properties: {
+                a: { type: 'string' }
+              },
+              dependencies: {
+                a: {
+                  properties: {
+                    b: { type: 'integer' }
+                  }
+                }
+              }
+            };
+            const definitions = {};
+            const formData = {};
+            expect(retrieveSchema(schema, definitions, formData)).toEqual({
+              type: 'object',
+              properties: {
+                a: { type: 'string' }
+              }
+            });
+          });
+        });
+
+        describe('true condition', () => {
+          it('should add properties', () => {
+            const schema = {
+              type: 'object',
+              properties: {
+                a: { type: 'string' }
+              },
+              dependencies: {
+                a: {
+                  properties: {
+                    b: { type: 'integer' }
+                  }
+                }
+              }
+            };
+            const definitions = {};
+            const formData = { a: '1' };
+            expect(retrieveSchema(schema, definitions, formData)).toEqual({
+              type: 'object',
+              properties: {
+                a: { type: 'string' },
+                b: { type: 'integer' }
+              }
+            });
+          });
+        });
+
+        describe('with $ref in dependency', () => {
+          it('should retrieve referenced schema', () => {
+            const schema = {
+              type: 'object',
+              properties: {
+                a: { type: 'string' }
+              },
+              dependencies: {
+                a: {
+                  $ref: '#/definitions/needsB'
+                }
+              }
+            };
+            const definitions = {
+              needsB: {
+                properties: {
+                  b: { type: 'integer' }
+                }
+              }
+            };
+            const formData = { a: '1' };
+            expect(retrieveSchema(schema, definitions, formData)).toEqual({
+              type: 'object',
+              properties: {
+                a: { type: 'string' },
+                b: { type: 'integer' }
+              }
+            });
+          });
+        });
+      });
+
+      describe('dynamic', () => {
+        describe('false condition', () => {
+          it('should not modify properties', () => {
+            const schema = {
+              type: 'object',
+              properties: {
+                a: { type: 'string' }
+              },
+              dependencies: {
+                a: {
+                  oneOf: [
+                    {
+                      properties: {
+                        a: { enum: ['int'] },
+                        b: { type: 'integer' }
+                      }
+                    },
+                    {
+                      properties: {
+                        a: { enum: ['bool'] },
+                        b: { type: 'boolean' }
+                      }
+                    }
+                  ]
+                }
+              }
+            };
+            const definitions = {};
+            const formData = {};
+            expect(retrieveSchema(schema, definitions, formData)).toEqual({
+              type: 'object',
+              properties: {
+                a: { type: 'string' }
+              }
+            });
+          });
+        });
+
+        describe('true condition', () => {
+          it.skip('should add \'first\' properties given \'first\' data', () => {
+            const schema = {
+              type: 'object',
+              properties: {
+                a: { type: 'string', enum: ['int', 'bool'] }
+              },
+              dependencies: {
+                a: {
+                  oneOf: [
+                    {
+                      properties: {
+                        a: { enum: ['int'] },
+                        b: { type: 'integer' }
+                      }
+                    },
+                    {
+                      properties: {
+                        a: { enum: ['bool'] },
+                        b: { type: 'boolean' }
+                      }
+                    }
+                  ]
+                }
+              }
+            };
+            const definitions = {};
+            const formData = { a: 'int' };
+            expect(retrieveSchema(schema, definitions, formData)).toEqual({
+              type: 'object',
+              properties: {
+                a: { type: 'string', enum: ['int', 'bool'] },
+                b: { type: 'integer' }
+              }
+            });
+          });
+
+          it.skip('should add \'second\' properties given \'second\' data', () => {
+            const schema = {
+              type: 'object',
+              properties: {
+                a: { type: 'string', enum: ['int', 'bool'] }
+              },
+              dependencies: {
+                a: {
+                  oneOf: [
+                    {
+                      properties: {
+                        a: { enum: ['int'] },
+                        b: { type: 'integer' }
+                      }
+                    },
+                    {
+                      properties: {
+                        a: { enum: ['bool'] },
+                        b: { type: 'boolean' }
+                      }
+                    }
+                  ]
+                }
+              }
+            };
+            const definitions = {};
+            const formData = { a: 'bool' };
+            expect(retrieveSchema(schema, definitions, formData)).toEqual({
+              type: 'object',
+              properties: {
+                a: { type: 'string', enum: ['int', 'bool'] },
+                b: { type: 'boolean' }
+              }
+            });
+          });
+        });
+
+        describe('with $ref in dependency', () => {
+          it.skip('should retrieve the referenced schema', () => {
+            const schema = {
+              type: 'object',
+              properties: {
+                a: { type: 'string', enum: ['int', 'bool'] }
+              },
+              dependencies: {
+                a: {
+                  $ref: '#/definitions/typedInput'
+                }
+              }
+            };
+            const definitions = {
+              typedInput: {
+                oneOf: [
+                  {
+                    properties: {
+                      a: { enum: ['int'] },
+                      b: { type: 'integer' }
+                    }
+                  },
+                  {
+                    properties: {
+                      a: { enum: ['bool'] },
+                      b: { type: 'boolean' }
+                    }
+                  }
+                ]
+              }
+            };
+            const formData = { a: 'bool' };
+            expect(retrieveSchema(schema, definitions, formData)).toEqual({
+              type: 'object',
+              properties: {
+                a: { type: 'string', enum: ['int', 'bool'] },
+                b: { type: 'boolean' }
+              }
+            });
+          });
         });
       });
     });
@@ -639,130 +1039,174 @@ describe('utils', () => {
       });
     });
 
-    describe('parseDateString()', () => {
-      it('should raise on invalid JSON datetime', () => {
-        expect(() => parseDateString('plop')).toThrowError(Error);
-      });
+    it('should retrieve referenced schema definitions', () => {
+      const schema = {
+        definitions: {
+          testdef: {
+            type: 'object',
+            properties: {
+              foo: { type: 'string' },
+              bar: { type: 'string' }
+            }
+          }
+        },
+        $ref: '#/definitions/testdef'
+      };
 
-      it('should return a default object when no datetime is passed', () => {
-        expect(parseDateString()).toEqual({
-          year: -1,
-          month: -1,
-          day: -1,
-          hour: -1,
-          minute: -1,
-          second: -1
-        });
+      expect(toIdSchema(schema, undefined, schema.definitions)).toEqual({
+        $id: 'root',
+        foo: { $id: 'root_foo' },
+        bar: { $id: 'root_bar' }
       });
+    });
 
-      it('should return a default object when time should not be included', () => {
-        expect(parseDateString(undefined, false)).toEqual({
-          year: -1,
-          month: -1,
-          day: -1,
-          hour: 0,
-          minute: 0,
-          second: 0
-        });
+    it('should handle idPrefix parameter', () => {
+      const schema = {
+        definitions: {
+          testdef: {
+            type: 'object',
+            properties: {
+              foo: { type: 'string' },
+              bar: { type: 'string' }
+            }
+          }
+        },
+        $ref: '#/definitions/testdef'
+      };
+
+      expect(
+        toIdSchema(schema, undefined, schema.definitions, {}, 'rjsf')
+      ).toEqual({
+        $id: 'rjsf',
+        foo: { $id: 'rjsf_foo' },
+        bar: { $id: 'rjsf_bar' }
       });
+    });
+  });
 
-      it('should parse a valid JSON datetime string', () => {
-        expect(parseDateString('2016-04-05T14:01:30.182Z')).toEqual({
+  describe('parseDateString()', () => {
+    it('should raise on invalid JSON datetime', () => {
+      expect(() => parseDateString('plop')).toThrowError(Error);
+    });
+
+    it('should return a default object when no datetime is passed', () => {
+      expect(parseDateString()).toEqual({
+        year: -1,
+        month: -1,
+        day: -1,
+        hour: -1,
+        minute: -1,
+        second: -1
+      });
+    });
+
+    it('should return a default object when time should not be included', () => {
+      expect(parseDateString(undefined, false)).toEqual({
+        year: -1,
+        month: -1,
+        day: -1,
+        hour: 0,
+        minute: 0,
+        second: 0
+      });
+    });
+
+    it('should parse a valid JSON datetime string', () => {
+      expect(parseDateString('2016-04-05T14:01:30.182Z')).toEqual({
+        year: 2016,
+        month: 4,
+        day: 5,
+        hour: 14,
+        minute: 1,
+        second: 30
+      });
+    });
+
+    it('should exclude time when includeTime is false', () => {
+      expect(parseDateString('2016-04-05T14:01:30.182Z', false)).toEqual({
+        year: 2016,
+        month: 4,
+        day: 5,
+        hour: 0,
+        minute: 0,
+        second: 0
+      });
+    });
+  });
+
+  describe('toDateString()', () => {
+    it('should transform an object to a valid json datetime if time=true', () => {
+      expect(
+        toDateString({
           year: 2016,
           month: 4,
           day: 5,
           hour: 14,
           minute: 1,
           second: 30
-        });
-      });
-
-      it('should exclude time when includeTime is false', () => {
-        expect(parseDateString('2016-04-05T14:01:30.182Z', false)).toEqual({
-          year: 2016,
-          month: 4,
-          day: 5,
-          hour: 0,
-          minute: 0,
-          second: 0
-        });
-      });
+        })
+      ).toEqual('2016-04-05T14:01:30.000Z');
     });
 
-    describe('toDateString()', () => {
-      it('should transform an object to a valid json datetime if time=true', () => {
-        expect(
-          toDateString({
+    it('should transform an object to a valid date string if time=false', () => {
+      expect(
+        toDateString(
+          {
             year: 2016,
             month: 4,
-            day: 5,
-            hour: 14,
-            minute: 1,
-            second: 30
-          })
-        ).toEqual('2016-04-05T14:01:30.000Z');
-      });
+            day: 5
+          },
+          false
+        )
+      ).toEqual('2016-04-05');
+    });
+  });
 
-      it('should transform an object to a valid date string if time=false', () => {
-        expect(
-          toDateString(
-            {
-              year: 2016,
-              month: 4,
-              day: 5
-            },
-            false
-          )
-        ).toEqual('2016-04-05');
-      });
+  describe('pad()', () => {
+    it('should pad a string with 0s', () => {
+      expect(pad(4, 3)).toEqual('004');
+    });
+  });
+
+  describe('dataURItoBlob()', () => {
+    it('should return the name of the file if present', () => {
+      const { blob, name } = dataURItoBlob(
+        'data:image/png;name=test.png;base64,VGVzdC5wbmc='
+      );
+      expect(name).toEqual('test.png');
+      expect(blob).toHaveProperty('size', 8);
+      expect(blob).toHaveProperty('type', 'image/png');
     });
 
-    describe('pad()', () => {
-      it('should pad a string with 0s', () => {
-        expect(pad(4, 3)).toEqual('004');
-      });
+    it('should return unknown if name is not provided', () => {
+      const { blob, name } = dataURItoBlob(
+        'data:image/png;base64,VGVzdC5wbmc='
+      );
+      expect(name).toEqual('unknown');
+      expect(blob).toHaveProperty('size', 8);
+      expect(blob).toHaveProperty('type', 'image/png');
     });
 
-    describe('dataURItoBlob()', () => {
-      it('should return the name of the file if present', () => {
-        const { blob, name } = dataURItoBlob(
-          'data:image/png;name=test.png;base64,VGVzdC5wbmc='
-        );
-        expect(name).toEqual('test.png');
-        expect(blob).toHaveProperty('size', 8);
-        expect(blob).toHaveProperty('type', 'image/png');
-      });
-
-      it('should return unknown if name is not provided', () => {
-        const { blob, name } = dataURItoBlob(
-          'data:image/png;base64,VGVzdC5wbmc='
-        );
-        expect(name).toEqual('unknown');
-        expect(blob).toHaveProperty('size', 8);
-        expect(blob).toHaveProperty('type', 'image/png');
-      });
-
-      it('should return ignore unsupported parameters', () => {
-        const { blob, name } = dataURItoBlob(
-          'data:image/png;unknown=foobar;name=test.png;base64,VGVzdC5wbmc='
-        );
-        expect(name).toEqual('test.png');
-        expect(blob).toHaveProperty('size', 8);
-        expect(blob).toHaveProperty('type', 'image/png');
-      });
+    it('should return ignore unsupported parameters', () => {
+      const { blob, name } = dataURItoBlob(
+        'data:image/png;unknown=foobar;name=test.png;base64,VGVzdC5wbmc='
+      );
+      expect(name).toEqual('test.png');
+      expect(blob).toHaveProperty('size', 8);
+      expect(blob).toHaveProperty('type', 'image/png');
     });
+  });
 
-    describe('deepEquals()', () => {
-      // Note: deepEquals implementation being extracted from node-deeper, it's
-      // worthless to reproduce all the tests existing for it; so we focus on the
-      // behavioral differences we introduced.
-      it('should assume functions are always equivalent', () => {
-        expect(deepEquals(() => {}, () => {})).toEqual(true);
-        expect(deepEquals({ foo() {} }, { foo() {} })).toEqual(true);
-        expect(
-          deepEquals({ foo: { bar() {} } }, { foo: { bar() {} } })
-        ).toEqual(true);
-      });
+  describe('deepEquals()', () => {
+    // Note: deepEquals implementation being extracted from node-deeper, it's
+    // worthless to reproduce all the tests existing for it; so we focus on the
+    // behavioral differences we introduced.
+    it('should assume functions are always equivalent', () => {
+      expect(deepEquals(() => {}, () => {})).toEqual(true);
+      expect(deepEquals({ foo() {} }, { foo() {} })).toEqual(true);
+      expect(deepEquals({ foo: { bar() {} } }, { foo: { bar() {} } })).toEqual(
+        true
+      );
     });
   });
 });

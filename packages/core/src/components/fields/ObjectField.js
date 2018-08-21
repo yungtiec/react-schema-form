@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import { orderProperties } from '../../utils';
+import { orderProperties, retrieveSchema } from '../../utils';
 
 class ObjectField extends Component {
   static defaultProps = {
@@ -37,7 +37,6 @@ class ObjectField extends Component {
 
   render() {
     const {
-      schema,
       uiSchema,
       formData,
       errorSchema,
@@ -51,13 +50,14 @@ class ObjectField extends Component {
       onFocus,
       registry
     } = this.props;
-    const { fields, templates, formContext } = registry;
+    const { definitions, fields, templates, formContext } = registry;
     const { SchemaField } = fields;
     const {
       ObjectFieldTemplate: Template,
       TitleTemplate,
       DescriptionTemplate
     } = templates;
+    const schema = retrieveSchema(this.props.schema, definitions, formData);
     const title = schema.title === undefined ? name : schema.title;
     const description = uiSchema['ui:description'] || schema.description;
     let orderedProperties;
@@ -136,6 +136,7 @@ if (process.env.NODE_ENV !== 'production') {
         PropTypes.oneOfType([PropTypes.func, PropTypes.object])
       ).isRequired,
       fields: PropTypes.objectOf(PropTypes.func).isRequired,
+      definitions: PropTypes.object.isRequired,
       formContext: PropTypes.object.isRequired
     })
   };

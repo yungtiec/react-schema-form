@@ -3,7 +3,7 @@ import { Simulate } from 'react-dom/test-utils';
 
 import SelectWidget from '@react-schema-form/bootstrap/src/components/widgets/SelectWidget';
 
-import { createFormComponent } from '@react-schema-form/bootstrap/tests/test_utils';
+import { createFormComponent } from './test_utils';
 
 describe('uiSchema', () => {
   describe('custom classNames', () => {

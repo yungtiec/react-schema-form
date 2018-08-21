@@ -79,14 +79,11 @@ function SchemaFieldRender(props) {
     displayLabel =
       isMultiSelect(schema, definitions) ||
       isFilesArray(schema, uiSchema, definitions);
-  }
-  if (schema.type === 'object') {
+  } else if (schema.type === 'object') {
     displayLabel = false;
-  }
-  if (schema.type === 'boolean' && !uiSchema['ui:widget']) {
+  } else if (schema.type === 'boolean' && !uiSchema['ui:widget']) {
     displayLabel = false;
-  }
-  if (uiSchema['ui:field']) {
+  } else if (uiSchema['ui:field']) {
     displayLabel = false;
   }
 

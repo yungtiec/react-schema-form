@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import DescriptionTemplate from '../templates/DescriptionTemplate.js';
 
 function CheckboxWidget(props) {
   const {
@@ -15,28 +14,30 @@ function CheckboxWidget(props) {
     onChange
   } = props;
   return (
-    <div
-      className={`form-group form-check${
-        disabled || readonly ? ' disabled' : ''
-      }`}
-    >
+    <Fragment>
       {schema.description && (
-        <DescriptionTemplate description={schema.description} />
+        <p className="mb-2 font-weight-light">{schema.description}</p>
       )}
-      <input
-        type="checkbox"
-        id={id}
-        checked={typeof value === 'undefined' ? false : value}
-        required={required}
-        disabled={disabled || readonly}
-        autoFocus={autofocus}
-        onChange={event => onChange(event.target.checked)}
-        className="form-check-input"
-      />
-      <label className="form-check-label" htmlFor={id}>
-        {label}
-      </label>
-    </div>
+      <div
+        className={`form-group form-check${
+          disabled || readonly ? ' disabled' : ''
+        }`}
+      >
+        <input
+          type="checkbox"
+          id={id}
+          checked={typeof value === 'undefined' ? false : value}
+          required={required}
+          disabled={disabled || readonly}
+          autoFocus={autofocus}
+          onChange={event => onChange(event.target.checked)}
+          className="form-check-input"
+        />
+        <label className="form-check-label" htmlFor={id}>
+          {label}
+        </label>
+      </div>
+    </Fragment>
   );
 }
 

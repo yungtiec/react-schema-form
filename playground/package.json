@@ -1,6 +1,6 @@
 {
   "name": "playground",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "license": "MIT",
   "private": true,
   "scripts": {
@@ -10,8 +10,8 @@
     "icons": "svgr --out-dir src/components/icons svg --icon"
   },
   "dependencies": {
-    "@react-schema-form/bootstrap": "^2.0.0",
-    "@react-schema-form/core": "^2.0.0",
+    "@react-schema-form/bootstrap": "^2.0.1",
+    "@react-schema-form/core": "^2.0.1",
     "atob": "^2.1.2",
     "codemirror": "^5.30.0",
     "react": ">=15",

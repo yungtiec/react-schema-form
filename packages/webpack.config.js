@@ -25,6 +25,7 @@ module.exports = {
       }
     ]
   },
+  devtool: 'source-map',
   externals: [
     nodeExternals({ modulesFromFile: { include: ['peerDependencies'] } })
   ]

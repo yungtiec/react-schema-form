@@ -2,10 +2,13 @@
   "name": "@react-schema-form/core",
   "description": "A React library capable of building HTML forms out of a JSON schema.",
   "version": "1.0.0",
-  "homepage": "https://github.com/mozilla-services/react-jsonschema-form#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "homepage": "https://github.com/MatejMazur/react-jsonschema-form#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mozilla-services/react-jsonschema-form.git"
+    "url": "git+https://github.com/MatejMazur/react-jsonschema-form.git"
   },
   "author": "Nicolas Perriault <nperriault@mozilla.com>",
   "keywords": [

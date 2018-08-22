@@ -9,7 +9,7 @@ function DescriptionTemplate(props) {
   }
   if (typeof description === 'string') {
     return (
-      <p id={id} className="field-description">
+      <p id={id} className="field-description font-weight-light">
         {description}
       </p>
     );

@@ -10,18 +10,18 @@
     "icons": "svgr --out-dir src/components/icons svg --icon"
   },
   "dependencies": {
+    "@reach/router": "1.1.1",
     "@react-schema-form/bootstrap": "^2.0.3",
-    "@react-schema-form/core": "^2.0.2",
-    "atob": "^2.1.2",
-    "codemirror": "^5.30.0",
-    "react": ">=15",
-    "react-codemirror2": "^5.0.4",
-    "react-dom": "^16.4.1"
+    "downshift": "2.1.4",
+    "json-format-highlight": "1.0.1",
+    "react": "^16.4.2",
+    "react-dom": "^16.4.2"
   },
   "devDependencies": {
     "@svgr/cli": "^2.0.0",
     "gh-pages": "^1.2.0",
     "parcel-bundler": "^1.9.2",
+    "react-hot-loader": "^4.3.4",
     "rimraf": "^2.6.2"
   },
   "prettier": {

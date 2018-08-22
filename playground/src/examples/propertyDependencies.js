@@ -1,6 +1,6 @@
 import React from 'react';
 
-module.exports = {
+export default {
   schema: {
     title: 'Property dependencies',
     description: 'These samples are best viewed without live validation.',
@@ -65,7 +65,7 @@ module.exports = {
       },
       billing_address: {
         'ui:help':
-          'It’s okay to have a billing address without a credit card number.'
+          'Itâs okay to have a billing address without a credit card number.'
       }
     },
     bidirectional: {

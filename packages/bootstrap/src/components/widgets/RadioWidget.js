@@ -24,6 +24,7 @@ function RadioWidget(props) {
           <div
             key={i}
             className={'form-check' + inline ? ' form-check-inline' : ''}
+            data-testid={inline ? 'check-inline' : 'check'}
           >
             <label htmlFor={name} className="form-check-label" />
             <input

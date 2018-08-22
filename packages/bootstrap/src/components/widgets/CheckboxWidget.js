@@ -16,7 +16,9 @@ function CheckboxWidget(props) {
   return (
     <Fragment>
       {schema.description && (
-        <p className="mb-2 font-weight-light">{schema.description}</p>
+        <p className="mb-2 font-weight-light field-description">
+          {schema.description}
+        </p>
       )}
       <div
         className={`form-group form-check${

@@ -98,7 +98,7 @@ describe('BooleanField', () => {
   });
 
   it('should support enumNames for radio widgets', () => {
-    const { node } = createFormComponent({
+    const { queryByText } = createFormComponent({
       schema: {
         type: 'boolean',
         enumNames: ['Yes', 'No']
@@ -107,15 +107,12 @@ describe('BooleanField', () => {
       uiSchema: { 'ui:widget': 'radio' }
     });
 
-    const labels = [].map.call(
-      node.querySelectorAll('.field-radio-group label'),
-      label => label.textContent
-    );
-    expect(labels).toEqual(['Yes', 'No']);
+    expect(queryByText(/Yes/)).toBeInTheDocument();
+    expect(queryByText(/No/)).toBeInTheDocument();
   });
 
   it('should support inline radio widgets', () => {
-    const { node } = createFormComponent({
+    const { queryAllByTestId } = createFormComponent({
       schema: { type: 'boolean' },
       formData: true,
       uiSchema: {
@@ -126,7 +123,7 @@ describe('BooleanField', () => {
       }
     });
 
-    expect(node.querySelectorAll('.radio-inline')).toHaveLength(2);
+    expect(queryAllByTestId('check-inline')).toHaveLength(2);
   });
 
   it('should support enumNames for select', () => {

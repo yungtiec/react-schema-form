@@ -1524,13 +1524,10 @@ describe('uiSchema', () => {
       });
 
       it('should render boolean option labels', () => {
-        const { node } = createFormComponent({ schema, uiSchema });
-        const labels = [].map.call(
-          node.querySelectorAll('.field-radio-group label'),
-          node => node.textContent
-        );
+        const { queryAllByText } = createFormComponent({ schema, uiSchema });
 
-        expect(labels).toEqual(['yes', 'no']);
+        expect(queryAllByText('yes')).toHaveLength(1);
+        expect(queryAllByText('no')).toHaveLength(1);
       });
 
       it('should support formData', () => {

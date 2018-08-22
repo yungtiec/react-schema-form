@@ -11,7 +11,8 @@ module.exports = {
   output: {
     path: path.resolve(BASE_PATH, output.dir),
     filename: output.base,
-    libraryTarget: 'commonjs'
+    library: 'ReactSchemaForm',
+    libraryTarget: 'umd'
   },
   module: {
     rules: [

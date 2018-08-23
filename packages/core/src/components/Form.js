@@ -1,16 +1,15 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 
 import {
   getDefaultFormState,
   retrieveSchema,
-  shouldRender,
   toIdSchema,
   setState
 } from '../utils';
 import validateFormData, { toErrorList } from '../validate';
 
-export default class Form extends Component {
+export default class Form extends PureComponent {
   static defaultProps = {
     uiSchema: {},
     noValidate: false,
@@ -28,10 +27,6 @@ export default class Form extends Component {
       return getStateFromProps(props, state);
     }
     return null;
-  }
-
-  shouldComponentUpdate(nextProps, nextState) {
-    return shouldRender(this, nextProps, nextState);
   }
 
   validate(formData) {

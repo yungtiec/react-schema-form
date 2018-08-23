@@ -16,8 +16,8 @@
     "build:readme": "toctoc README.md -w",
     "build": "run-s build:pkg build:playground build:readme",
     "start": "cd playground && npm start",
-    "test": "jest --env=jsdom",
-    "tdd": "jest --env=jsdom --watch",
+    "test": "jest",
+    "tdd": "jest --watch",
     "preversion": "run-s build format lint",
     "npm": "npm run build:pkg && npm run build:readme && lerna publish",
     "gh-pages": "cd playground && npm run gh-pages"

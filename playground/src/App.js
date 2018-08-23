@@ -12,6 +12,7 @@ function App() {
       </Link>
 
       <Router>
+        <Page path="/" example="simple" />
         <Page path=":example" />
       </Router>
     </div>

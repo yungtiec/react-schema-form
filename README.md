@@ -1,5 +1,7 @@
 # React Schema Form
 
+_(readme is still under development)_
+
 A [React](http://facebook.github.io/react/) library capable of building HTML forms out of a [JSON schema](http://json-schema.org/).
 The core of the library is **UI agnostic** so you can use one of the [already built themes](/packages) or you can build your own!
 

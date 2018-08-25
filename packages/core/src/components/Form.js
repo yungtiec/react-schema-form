@@ -127,8 +127,6 @@ export default class Form extends PureComponent {
       fields: this.props.fields,
       templates: this.props.templates,
       widgets: this.props.widgets,
-      ArrayFieldTemplate: this.props.ArrayFieldTemplate,
-      ObjectFieldTemplate: this.props.ObjectFieldTemplate,
       definitions: this.props.schema.definitions || {},
       formContext: this.props.formContext || {}
     };

@@ -1,13 +1,13 @@
-import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
+import React, { PureComponent } from "react";
+import PropTypes from "prop-types";
 
 import {
   getDefaultFormState,
   retrieveSchema,
   toIdSchema,
   setState
-} from '../utils';
-import validateFormData, { toErrorList } from '../validate';
+} from "../utils";
+import validateFormData, { toErrorList } from "../validate";
 
 export default class Form extends PureComponent {
   static defaultProps = {
@@ -105,9 +105,10 @@ export default class Form extends PureComponent {
             this.props.onError(errors);
           } else {
             /*eslint-disable-next-line*/
-            console.error('Form validation failed', errors);
+            console.error("Form validation failed", errors);
           }
         });
+        if (this.props.invalidCallback) this.props.invalidCallback();
         return;
       }
     }
@@ -116,7 +117,7 @@ export default class Form extends PureComponent {
       if (this.props.onSubmit) {
         this.props.onSubmit({
           ...this.state,
-          status: 'submitted'
+          status: "submitted"
         });
       }
     });
@@ -140,7 +141,7 @@ export default class Form extends PureComponent {
       safeRenderCompletion,
       id,
       idPrefix,
-      className = 'rjsf',
+      className = "rjsf",
       name,
       method,
       target,
@@ -192,7 +193,7 @@ export default class Form extends PureComponent {
 
 function getStateFromProps(props, state = {}) {
   const { schema, uiSchema, liveValidate, noValidate } = props;
-  const edit = typeof props.formData !== 'undefined';
+  const edit = typeof props.formData !== "undefined";
   const mustValidate = edit && !noValidate && liveValidate;
   const { definitions } = schema;
   const formData = getDefaultFormState(schema, props.formData, definitions);
@@ -215,7 +216,7 @@ function getStateFromProps(props, state = {}) {
 
   const idSchema = toIdSchema(
     retrievedSchema,
-    uiSchema['ui:rootFieldId'],
+    uiSchema["ui:rootFieldId"],
     definitions,
     formData,
     props.idPrefix
@@ -239,7 +240,7 @@ function getStateFromProps(props, state = {}) {
   };
 }
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== "production") {
   Form.propTypes = {
     schema: PropTypes.object.isRequired,
     uiSchema: PropTypes.object,
@@ -271,6 +272,7 @@ if (process.env.NODE_ENV !== 'production') {
     noValidate: PropTypes.bool,
     noHtml5Validate: PropTypes.bool,
     liveValidate: PropTypes.bool,
+    invalidCallback: PropTypes.func,
     validate: PropTypes.func,
     transformErrors: PropTypes.func,
     safeRenderCompletion: PropTypes.bool,
